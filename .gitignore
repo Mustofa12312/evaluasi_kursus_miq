@@ -27,3 +27,5 @@ dist-ssr
 node.md
 prd.md
 firestore.rules
+.env
+.env.*
