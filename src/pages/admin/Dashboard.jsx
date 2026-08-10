@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getDashboardStats } from '../../services/db';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { Users, UserCheck, BookOpen, Settings, Target } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
@@ -14,53 +15,81 @@ export default function AdminDashboard() {
   }, []);
 
   if (loading) {
-    return <div className="text-center py-16 text-muted">Memuat data dashboard...</div>;
+    return (
+      <div className="flex justify-center items-center h-full animate-pulse">
+        <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        <span className="ml-3 text-slate-400 font-medium">Memuat data dashboard...</span>
+      </div>
+    );
   }
 
   const colors = ['#10b981', '#38bdf8', '#c084fc', '#f59e0b'];
 
   return (
-    <div className="animate-fade-in">
-      <h1 className="text-3xl font-display mb-2">Dashboard Evaluasi</h1>
-      <p className="text-muted mb-8">Ringkasan agregat data evaluasi Kursus Tartil Al-Qur'an.</p>
+    <div className="animate-slide-up opacity-0 fill-mode-forwards">
+      <div className="mb-10">
+        <h1 className="text-4xl font-display font-bold text-white mb-2">Dashboard <span className="text-emerald-400">Overview</span></h1>
+        <p className="text-slate-400 text-lg">Ringkasan agregat data evaluasi Kursus Tartil Al-Qur'an secara real-time.</p>
+      </div>
       
-      {/* Metrics Row */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        <div className="glass-panel text-center p-6 border-t-4 border-t-primary">
-          <h3 className="text-4xl text-primary font-bold mb-2">{stats.totalResponden}</h3>
-          <p className="text-sm text-muted">Total Responden</p>
+      {/* Premium Metrics Row */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 lg:gap-6 mb-10">
+        <div className="bg-slate-800/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700 hover:border-emerald-500/50 transition-colors shadow-lg shadow-black/20 group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-emerald-500/20 rounded-lg text-emerald-400 group-hover:scale-110 transition-transform"><Target size={24} /></div>
+          </div>
+          <h3 className="text-4xl text-white font-bold tracking-tight mb-1">{stats.totalResponden}</h3>
+          <p className="text-sm text-slate-400 font-medium">Total Responden</p>
         </div>
-        <div className="glass-panel text-center p-6 border-t-4 border-t-accent">
-          <h3 className="text-3xl font-bold mb-2">{stats.pesertaCount}</h3>
-          <p className="text-sm text-muted">Peserta</p>
+        
+        <div className="bg-slate-800/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700 hover:border-emerald-500/50 transition-colors shadow-lg shadow-black/20 group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400 group-hover:scale-110 transition-transform"><Users size={24} /></div>
+          </div>
+          <h3 className="text-3xl text-white font-bold tracking-tight mb-1">{stats.pesertaCount}</h3>
+          <p className="text-sm text-slate-400 font-medium">Peserta</p>
         </div>
-        <div className="glass-panel text-center p-6 border-t-4 border-t-blue-400">
-          <h3 className="text-3xl font-bold mb-2">{stats.pendampingCount}</h3>
-          <p className="text-sm text-muted">Pendamping</p>
+        
+        <div className="bg-slate-800/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700 hover:border-sky-500/50 transition-colors shadow-lg shadow-black/20 group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-sky-500/10 rounded-lg text-sky-400 group-hover:scale-110 transition-transform"><UserCheck size={24} /></div>
+          </div>
+          <h3 className="text-3xl text-white font-bold tracking-tight mb-1">{stats.pendampingCount}</h3>
+          <p className="text-sm text-slate-400 font-medium">Pendamping</p>
         </div>
-        <div className="glass-panel text-center p-6 border-t-4 border-t-purple-400">
-          <h3 className="text-3xl font-bold mb-2">{stats.muallimCount}</h3>
-          <p className="text-sm text-muted">Muallim</p>
+        
+        <div className="bg-slate-800/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700 hover:border-purple-500/50 transition-colors shadow-lg shadow-black/20 group">
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400 group-hover:scale-110 transition-transform"><BookOpen size={24} /></div>
+          </div>
+          <h3 className="text-3xl text-white font-bold tracking-tight mb-1">{stats.muallimCount}</h3>
+          <p className="text-sm text-slate-400 font-medium">Muallim</p>
         </div>
-        <div className="glass-panel text-center p-6 border-t-4 border-t-warning">
-          <h3 className="text-4xl text-warning font-bold mb-2">{stats.rataKepuasan}</h3>
-          <p className="text-sm text-muted">Rata-rata Kepuasan</p>
+        
+        <div className="bg-slate-800/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700 hover:border-amber-500/50 transition-colors shadow-lg shadow-black/20 group relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-bl-full -z-10"></div>
+          <div className="flex justify-between items-start mb-4">
+            <div className="p-2 bg-amber-500/20 rounded-lg text-amber-400 group-hover:scale-110 transition-transform"><Settings size={24} /></div>
+          </div>
+          <h3 className="text-4xl text-amber-400 font-bold tracking-tight mb-1">{stats.rataKepuasan}</h3>
+          <p className="text-sm text-slate-400 font-medium">Rata-rata Kepuasan</p>
         </div>
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div className="glass-panel p-6">
-          <h3 className="text-xl font-semibold mb-6">Kepuasan per Program (Skala 5)</h3>
-          <div className="h-64">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 mb-8">
+        <div className="lg:col-span-2 bg-slate-800/60 backdrop-blur-md p-8 rounded-3xl border border-slate-700 shadow-lg shadow-black/20">
+          <h3 className="text-xl font-bold text-white mb-8">Kepuasan per Program <span className="text-sm font-normal text-slate-400 ml-2">(Skala 5)</span></h3>
+          <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={stats.chartData}>
-                <XAxis dataKey="name" stroke="var(--color-text-muted)" fontSize={12} />
-                <YAxis domain={[0, 5]} stroke="var(--color-text-muted)" fontSize={12} />
+              <BarChart data={stats.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <XAxis dataKey="name" stroke="#94a3b8" fontSize={13} axisLine={false} tickLine={false} dy={10} />
+                <YAxis domain={[0, 5]} stroke="#94a3b8" fontSize={13} axisLine={false} tickLine={false} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '8px' }} 
+                  cursor={{fill: 'rgba(255,255,255,0.05)'}}
+                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', color: '#fff' }} 
                 />
-                <Bar dataKey="kepuasan" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="kepuasan" radius={[6, 6, 0, 0]} maxBarSize={60}>
                   {stats.chartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                   ))}
@@ -70,22 +99,25 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="glass-panel p-6">
-          <h3 className="text-xl font-semibold mb-6">Informasi Sistem</h3>
-          <ul className="space-y-4 text-muted">
-            <li className="flex justify-between border-b border-border pb-2">
-              <span>Status Pengumpulan</span>
-              <span className="text-success font-semibold">Aktif</span>
-            </li>
-            <li className="flex justify-between border-b border-border pb-2">
-              <span>Batas Minimum Responden (Anonimitas)</span>
-              <span>5</span>
-            </li>
-            <li className="flex justify-between border-b border-border pb-2">
-              <span>Versi Form</span>
-              <span>2026.1</span>
-            </li>
-          </ul>
+        <div className="bg-slate-800/60 backdrop-blur-md p-8 rounded-3xl border border-slate-700 shadow-lg shadow-black/20 flex flex-col">
+          <h3 className="text-xl font-bold text-white mb-8">Informasi Sistem</h3>
+          <div className="space-y-6 flex-1">
+            <div className="flex flex-col border-b border-slate-700/50 pb-4">
+              <span className="text-sm text-slate-400 mb-1">Status Pengumpulan</span>
+              <span className="text-emerald-400 font-bold flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Aktif & Menerima Data
+              </span>
+            </div>
+            <div className="flex flex-col border-b border-slate-700/50 pb-4">
+              <span className="text-sm text-slate-400 mb-1">Batas Minimum Anonimitas</span>
+              <span className="text-white font-bold text-lg">5 Responden</span>
+            </div>
+            <div className="flex flex-col pb-4">
+              <span className="text-sm text-slate-400 mb-1">Versi Form API</span>
+              <span className="text-white font-mono bg-slate-900 px-3 py-1 rounded w-fit mt-1">2026.1.0-stable</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

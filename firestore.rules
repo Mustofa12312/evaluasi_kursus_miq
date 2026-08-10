@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isValidRole(role) {
+      return role in ['peserta', 'pendamping', 'muallim', 'panitia'];
+    }
+
+    function isEvaluationData() {
+      // Wajib memiliki field role, answers, context, dan submittedAt
+      return request.resource.data.keys().hasAll(['role', 'answers', 'context', 'submittedAt']) &&
+             isValidRole(request.resource.data.role);
+    }
+
+    // Collection "evaluations"
+    match /evaluations/{docId} {
+      // Publik hanya bisa CREATE (menambahkan data baru)
+      // Tidak bisa READ (melihat data orang lain) atau UPDATE/DELETE
+      allow create: if isEvaluationData();
+      
+      // Admin yang sudah login (jika Firebase Auth diaktifkan kelak) bisa baca dan tulis
+      // Untuk fase development ini, jika tidak ada auth, Anda bisa menyesuaikan
+      // allow read: if request.auth != null;
+      
+      // Mengingat ini adalah MVP dan belum ada sistem login yang diterapkan (Admin Area open),
+      // untuk kebutuhan produksi yang sesungguhnya Anda harus mengganti baris di bawah
+      // dengan `allow read: if request.auth != null;` (jika menggunakan Auth).
+      allow read: if true; // PERINGATAN: Hanya untuk tahap awal/Testing.
+    }
+    
+    // Konfigurasi untuk master data (programs, classes, muallims, questions)
+    // Publik boleh READ untuk menampilkan opsi formulir, tapi tidak boleh menuliskannya.
+    match /programs/{docId} {
+      allow read: if true;
+      allow write: if false; // Hanya admin lewat console/backend yang bisa tulis
+    }
+    match /classes/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /muallims/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /questions/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

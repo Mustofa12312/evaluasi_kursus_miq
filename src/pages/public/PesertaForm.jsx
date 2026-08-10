@@ -116,14 +116,12 @@ export default function PesertaForm() {
           Evaluasi Peserta
         </h1>
         
-        <div className="relative max-w-2xl mx-auto px-4">
-          {/* Background Track */}
-          <div className="absolute top-5 left-10 right-10 h-1.5 bg-slate-800 rounded-full -z-10"></div>
-          
-          {/* Active Track */}
+        <div className="relative max-w-2xl mx-auto px-2 sm:px-6">
+          {/* Track Lines */}
+          <div className="absolute top-5 left-10 right-10 sm:left-14 sm:right-14 h-1 bg-slate-800 rounded-full -translate-y-1/2 -z-10"></div>
           <div 
-            className="absolute top-5 left-10 h-1.5 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full -z-10 transition-all duration-700 shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
-            style={{ width: `calc(${(step - 1) * 33.33}% - 20px)` }}
+            className="absolute top-5 left-10 sm:left-14 h-1 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full -translate-y-1/2 -z-10 transition-all duration-700 shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
+            style={{ width: `calc(${(step - 1) * 33.33}%)` }}
           ></div>
           
           <div className="flex justify-between items-start">
@@ -133,18 +131,21 @@ export default function PesertaForm() {
               const isCurrent = step === currentStep;
               
               return (
-                <div key={label} className="flex flex-col items-center">
+                <div key={label} className="flex flex-col items-center relative z-10 w-20">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mb-3 transition-all duration-500 shadow-lg
                     ${isActive 
                       ? 'bg-emerald-500 text-slate-900 border-2 border-emerald-400 scale-110 shadow-emerald-500/50' 
                       : 'bg-slate-800 text-slate-500 border-2 border-slate-700'
                     }
-                    ${isCurrent ? 'ring-4 ring-emerald-500/20' : ''}
+                    ${isCurrent ? 'ring-4 ring-emerald-500/20 ring-offset-2 ring-offset-slate-900' : ''}
                   `}>
-                    {isActive ? <CheckCircle size={20} className={isCurrent ? "opacity-0" : "opacity-100 absolute"} /> : null}
-                    <span className={isActive && !isCurrent ? "opacity-0" : "opacity-100"}>{currentStep}</span>
+                    {isActive && !isCurrent ? (
+                      <CheckCircle size={20} />
+                    ) : (
+                      <span>{currentStep}</span>
+                    )}
                   </div>
-                  <span className={`text-sm font-medium transition-colors duration-300 ${isActive ? 'text-emerald-400' : 'text-slate-500'}`}>
+                  <span className={`text-sm font-medium transition-colors duration-300 ${isActive ? 'text-emerald-400' : 'text-slate-500'} text-center`}>
                     {label}
                   </span>
                 </div>
