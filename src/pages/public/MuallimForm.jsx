@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPrograms, getClassesByProgram, getQuestionsByRole, submitEvaluation } from '../../services/db';
+import { getPrograms, getClassesByProgram, getQuestionsByRole, submitEvaluation, getSecuritySettings } from '../../services/db';
 import SelectCard from '../../components/form/SelectCard';
 import DynamicForm from '../../components/form/DynamicForm';
 import IdentityForm from '../../components/form/IdentityForm';
+import PinGate from '../../components/form/PinGate';
 import { CheckCircle, ArrowLeft } from 'lucide-react';
 
 export default function MuallimForm() {
   const navigate = useNavigate();
   
   // States for flow
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0); // 0: PinGate, 1: Identity, 2: Program, 3: Class, 4: Eval
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [pinSettings, setPinSettings] = useState({ enabled: false, pin: '' });
   
   // Data States
   const [programs, setPrograms] = useState([]);
@@ -31,9 +33,19 @@ export default function MuallimForm() {
 
   // Fetch initial data (Programs)
   useEffect(() => {
-    getPrograms().then(data => {
-      setPrograms(data);
+    Promise.all([
+      getPrograms(),
+      getSecuritySettings()
+    ]).then(([programsData, settingsData]) => {
+      setPrograms(programsData);
       setLoadingObj(prev => ({ ...prev, prog: false }));
+      
+      if (settingsData && settingsData.muallim?.enabled) {
+        setPinSettings(settingsData.muallim);
+        setStep(0);
+      } else {
+        setStep(1);
+      }
     });
   }, []);
 
@@ -152,6 +164,14 @@ export default function MuallimForm() {
 
       {/* Step Content */}
       <div className="min-h-[500px] relative">
+        {step === 0 && (
+          <PinGate 
+            roleName="Muallim" 
+            requiredPin={pinSettings.pin} 
+            onSuccess={() => setStep(1)} 
+          />
+        )}
+
         {step === 1 && (
           <IdentityForm onSubmit={handleSelectIdentity} hideLembaga={true} />
         )}

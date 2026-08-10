@@ -59,6 +59,10 @@ export default function AdminLayout() {
             <ClipboardList size={20} />
             Kuesioner Builder
           </Link>
+          <Link to="/admin/keamanan" className={getLinkClass('/admin/keamanan')}>
+            <Shield size={20} />
+            Pengaturan Keamanan
+          </Link>
 
           <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2 ml-4">Perbaikan</div>
           <Link to="/admin/action-plan" className={getLinkClass('/admin/action-plan')}>

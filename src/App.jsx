@@ -18,6 +18,7 @@ import Analisis from './pages/admin/Analisis';
 import ActionPlan from './pages/admin/ActionPlan';
 import MasterPertanyaan from './pages/admin/MasterPertanyaan';
 import MasterData from './pages/admin/MasterData';
+import SecuritySettings from './pages/admin/SecuritySettings';
 import { PeriodProvider } from './context/PeriodContext';
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
             <Route path="analisis" element={<Analisis />} />
             <Route path="master-pertanyaan" element={<MasterPertanyaan />} />
             <Route path="master-data" element={<MasterData />} />
+            <Route path="keamanan" element={<SecuritySettings />} />
             <Route path="action-plan" element={<ActionPlan />} />
           </Route>
         </Routes>

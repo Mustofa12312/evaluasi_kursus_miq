@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPrograms, getClassesByProgram, getMuallimsByClass, getQuestionsByRole, submitEvaluation } from '../../services/db';
+import { getPrograms, getClassesByProgram, getMuallimsByClass, getQuestionsByRole, submitEvaluation, getSecuritySettings } from '../../services/db';
 import SelectCard from '../../components/form/SelectCard';
 import DynamicForm from '../../components/form/DynamicForm';
 import IdentityForm from '../../components/form/IdentityForm';
+import PinGate from '../../components/form/PinGate';
 import { CheckCircle, ArrowLeft } from 'lucide-react';
 
 export default function PesertaForm() {
   const navigate = useNavigate();
   
   // States for flow
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [pinSettings, setPinSettings] = useState({ enabled: false, pin: '' });
   
   // Data States
   const [programs, setPrograms] = useState([]);
@@ -31,11 +33,21 @@ export default function PesertaForm() {
     muallimId: null
   });
 
-  // Fetch initial data (Programs)
+  // Fetch initial data (Programs & Security)
   useEffect(() => {
-    getPrograms().then(data => {
-      setPrograms(data);
+    Promise.all([
+      getPrograms(),
+      getSecuritySettings()
+    ]).then(([programsData, settingsData]) => {
+      setPrograms(programsData);
       setLoadingObj(prev => ({ ...prev, prog: false }));
+      
+      if (settingsData && settingsData.peserta?.enabled) {
+        setPinSettings(settingsData.peserta);
+        setStep(0);
+      } else {
+        setStep(1);
+      }
     });
   }, []);
 
@@ -164,6 +176,14 @@ export default function PesertaForm() {
 
       {/* Step Content */}
       <div className="min-h-[500px] relative">
+        {step === 0 && (
+          <PinGate 
+            roleName="Peserta" 
+            requiredPin={pinSettings.pin} 
+            onSuccess={() => setStep(1)} 
+          />
+        )}
+        
         {step === 1 && (
           <IdentityForm onSubmit={handleSelectIdentity} />
         )}

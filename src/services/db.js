@@ -1,4 +1,4 @@
-import { collection, getDocs, addDoc, query, where, orderBy, serverTimestamp, doc, updateDoc, writeBatch, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, query, where, orderBy, serverTimestamp, doc, updateDoc, writeBatch, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
 // Data Mock untuk Seed Function
@@ -272,4 +272,34 @@ export const updateMasterData = async (collectionName, id, data) => {
 export const deleteMasterData = async (collectionName, id) => {
   const docRef = doc(db, collectionName, id);
   await deleteDoc(docRef);
+};
+
+// --- SECURITY SETTINGS ---
+export const getSecuritySettings = async () => {
+  try {
+    const docRef = doc(db, "settings", "security");
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docSnap.data();
+    }
+    return {
+      peserta: { enabled: false, pin: '' },
+      pendamping: { enabled: false, pin: '' },
+      muallim: { enabled: false, pin: '' },
+      panitia: { enabled: false, pin: '' },
+    };
+  } catch (error) {
+    console.error("Error getSecuritySettings:", error);
+    return null;
+  }
+};
+
+export const updateSecuritySettings = async (data) => {
+  try {
+    const docRef = doc(db, "settings", "security");
+    await setDoc(docRef, data, { merge: true });
+  } catch (error) {
+    console.error("Error updateSecuritySettings:", error);
+    throw error;
+  }
 };
