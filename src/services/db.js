@@ -104,16 +104,6 @@ export const getQuestionsByRole = async (role) => {
   }
 };
 
-export const getAllQuestions = async () => {
-  try {
-    const q = query(collection(db, "questions"));
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({ _docId: doc.id, ...doc.data() }));
-  } catch (err) {
-    console.error("Error getAllQuestions:", err);
-    return mockQuestions;
-  }
-};
 
 export const submitEvaluation = async (evaluationData) => {
   // Fetch active period
