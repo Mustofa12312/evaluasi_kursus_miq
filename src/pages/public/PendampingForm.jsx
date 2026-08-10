@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getPrograms, getClassesByProgram, getQuestionsByRole, submitEvaluation } from '../../services/db';
 import SelectCard from '../../components/form/SelectCard';
 import DynamicForm from '../../components/form/DynamicForm';
+import IdentityForm from '../../components/form/IdentityForm';
 import { CheckCircle, ArrowLeft } from 'lucide-react';
 
 export default function PendampingForm() {
@@ -23,6 +24,7 @@ export default function PendampingForm() {
   
   // Selection Context
   const [context, setContext] = useState({
+    identity: null,
     programId: null,
     classId: null
   });
@@ -35,10 +37,15 @@ export default function PendampingForm() {
     });
   }, []);
 
+  const handleSelectIdentity = (identity) => {
+    setContext(prev => ({ ...prev, identity }));
+    setStep(2);
+  };
+
   const handleSelectProgram = (id) => {
     setContext(prev => ({ ...prev, programId: id, classId: null }));
     setLoadingObj(prev => ({ ...prev, cls: true }));
-    setStep(2);
+    setStep(3);
     getClassesByProgram(id).then(data => {
       setClasses(data);
       setLoadingObj(prev => ({ ...prev, cls: false }));
@@ -48,7 +55,7 @@ export default function PendampingForm() {
   const handleSelectClass = (id) => {
     setContext(prev => ({ ...prev, classId: id }));
     setLoadingObj(prev => ({ ...prev, qst: true }));
-    setStep(3);
+    setStep(4);
     getQuestionsByRole('pendamping').then(data => {
       setQuestions(data);
       setLoadingObj(prev => ({ ...prev, qst: false }));
@@ -109,11 +116,11 @@ export default function PendampingForm() {
           <div className="absolute top-5 left-10 right-10 sm:left-14 sm:right-14 h-1 bg-slate-800 rounded-full -translate-y-1/2 -z-10"></div>
           <div 
             className="absolute top-5 left-10 sm:left-14 h-1 bg-gradient-to-r from-sky-500 to-indigo-400 rounded-full -translate-y-1/2 -z-10 transition-all duration-700 shadow-[0_0_10px_rgba(56,189,248,0.5)]" 
-            style={{ width: `calc(${(step - 1) * 50}%)` }}
+            style={{ width: `calc(${(step - 1) * 33.33}%)` }}
           ></div>
           
           <div className="flex justify-between items-start">
-            {['Program', 'Kelas/Rombongan', 'Evaluasi'].map((label, idx) => {
+            {['Identitas', 'Program', 'Kelas/Rombongan', 'Evaluasi'].map((label, idx) => {
               const currentStep = idx + 1;
               const isActive = step >= currentStep;
               const isCurrent = step === currentStep;
@@ -146,18 +153,27 @@ export default function PendampingForm() {
       {/* Step Content */}
       <div className="min-h-[500px] relative">
         {step === 1 && (
-          <SelectCard 
-            title="Pilih Program yang Diikuti Rombongan Anda"
-            options={programs}
-            selectedId={context.programId}
-            onSelect={handleSelectProgram}
-            loading={loadingObj.prog}
-          />
+          <IdentityForm onSubmit={handleSelectIdentity} />
         )}
-        
+
         {step === 2 && (
           <div className="animate-slide-up opacity-0 fill-mode-forwards">
             <button onClick={() => setStep(1)} className="text-sky-400 font-medium text-sm mb-6 inline-flex items-center hover:text-sky-300 transition-colors bg-sky-400/10 px-4 py-2 rounded-lg">
+              <ArrowLeft size={16} className="mr-2" /> Kembali ke Identitas
+            </button>
+            <SelectCard 
+              title="Pilih Program yang Diikuti Rombongan Anda"
+              options={programs}
+              selectedId={context.programId}
+              onSelect={handleSelectProgram}
+              loading={loadingObj.prog}
+            />
+          </div>
+        )}
+        
+        {step === 3 && (
+          <div className="animate-slide-up opacity-0 fill-mode-forwards">
+            <button onClick={() => setStep(2)} className="text-sky-400 font-medium text-sm mb-6 inline-flex items-center hover:text-sky-300 transition-colors bg-sky-400/10 px-4 py-2 rounded-lg">
               <ArrowLeft size={16} className="mr-2" /> Kembali ke Program
             </button>
             <SelectCard 
@@ -170,12 +186,12 @@ export default function PendampingForm() {
           </div>
         )}
         
-        {step === 3 && (
+        {step === 4 && (
           <div>
             <DynamicForm 
               questions={questions}
               onSubmit={handleFormSubmit}
-              onBack={() => setStep(2)}
+              onBack={() => setStep(3)}
               loading={loadingObj.qst || isSubmitting}
             />
           </div>

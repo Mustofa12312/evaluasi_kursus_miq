@@ -47,40 +47,61 @@ const mockQuestions = [
 ];
 
 export const getPrograms = async () => {
-  const q = query(collection(db, "programs"));
-  const querySnapshot = await getDocs(q);
-  const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
-  
-  // Jika kosong (karena database baru), kembalikan data mock fallback agar UI tidak blank
-  if (data.length === 0) return mockPrograms;
-  return data;
+  try {
+    const q = query(collection(db, "programs"));
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
+    
+    if (data.length === 0) return mockPrograms;
+    return data;
+  } catch (err) {
+    console.error("Error getPrograms:", err);
+    return mockPrograms;
+  }
 };
 
 export const getClassesByProgram = async (programId) => {
-  const q = query(collection(db, "classes"), where("programId", "==", programId));
-  const querySnapshot = await getDocs(q);
-  const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
-  
-  if (data.length === 0) return mockClasses.filter(c => c.programId === programId);
-  return data;
+  try {
+    const q = query(collection(db, "classes"), where("programId", "==", programId));
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
+    
+    if (data.length === 0) return mockClasses.filter(c => c.programId === programId);
+    return data;
+  } catch (err) {
+    console.error("Error getClassesByProgram:", err);
+    return mockClasses.filter(c => c.programId === programId);
+  }
 };
 
 export const getMuallimsByClass = async (classId) => {
-  const q = query(collection(db, "muallims"), where("classId", "==", classId));
-  const querySnapshot = await getDocs(q);
-  const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
-  
-  if (data.length === 0) return mockMuallims.filter(m => m.classId === classId);
-  return data;
+  try {
+    const q = query(collection(db, "muallims"), where("classId", "==", classId));
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
+    
+    if (data.length === 0) return mockMuallims.filter(m => m.classId === classId);
+    return data;
+  } catch (err) {
+    console.error("Error getMuallimsByClass:", err);
+    return mockMuallims.filter(m => m.classId === classId);
+  }
 };
 
 export const getQuestionsByRole = async (role) => {
-  const q = query(collection(db, "questions"), where("role", "==", role), orderBy("order", "asc"));
-  const querySnapshot = await getDocs(q);
-  const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
-  
-  if (data.length === 0) return mockQuestions.filter(q => q.role === role).sort((a, b) => a.order - b.order);
-  return data;
+  try {
+    const q = query(collection(db, "questions"), where("role", "==", role));
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
+    
+    data.sort((a, b) => (a.order || 0) - (b.order || 0));
+    
+    if (data.length === 0) return mockQuestions.filter(q => q.role === role).sort((a, b) => a.order - b.order);
+    return data;
+  } catch (err) {
+    console.error("Error getQuestionsByRole:", err);
+    return mockQuestions.filter(q => q.role === role).sort((a, b) => a.order - b.order);
+  }
 };
 
 export const submitEvaluation = async (evaluationData) => {

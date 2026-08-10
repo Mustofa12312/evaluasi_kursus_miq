@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getQuestionsByRole, submitEvaluation } from '../../services/db';
 import DynamicForm from '../../components/form/DynamicForm';
+import IdentityForm from '../../components/form/IdentityForm';
 import { CheckCircle } from 'lucide-react';
 
 export default function PanitiaForm() {
@@ -10,6 +11,9 @@ export default function PanitiaForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   
+  const [step, setStep] = useState(1);
+  const [identity, setIdentity] = useState(null);
+
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,11 +25,16 @@ export default function PanitiaForm() {
     });
   }, []);
 
+  const handleSelectIdentity = (ident) => {
+    setIdentity(ident);
+    setStep(2);
+  };
+
   const handleFormSubmit = async (formData) => {
     setIsSubmitting(true);
     const evaluationData = {
       role: 'panitia',
-      context: { programId: 'all', classId: 'all' }, // Panitia mengevaluasi secara keseluruhan
+      context: { programId: 'all', classId: 'all', identity }, // Panitia mengevaluasi secara keseluruhan
       answers: formData,
       submittedAt: new Date().toISOString()
     };
@@ -74,11 +83,21 @@ export default function PanitiaForm() {
       </div>
 
       <div className="min-h-[500px]">
-        <DynamicForm 
-          questions={questions}
-          onSubmit={handleFormSubmit}
-          loading={loading || isSubmitting}
-        />
+        {step === 1 && (
+          <IdentityForm 
+            onSubmit={handleSelectIdentity} 
+            lembagaLabel="Divisi atau Pengamat" 
+            lembagaPlaceholder="Contoh: Divisi Acara" 
+          />
+        )}
+        {step === 2 && (
+          <DynamicForm 
+            questions={questions}
+            onSubmit={handleFormSubmit}
+            loading={loading || isSubmitting}
+            onBack={() => setStep(1)}
+          />
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,12 @@
 import { useState } from 'react';
 
-export default function IdentityForm({ onSubmit }) {
+export default function IdentityForm({ 
+  onSubmit, 
+  hideLembaga = false, 
+  lembagaLabel = "Asal Lembaga / Utusan",
+  lembagaPlaceholder = "Masukkan asal lembaga/instansi",
+  lembagaRequired = false
+}) {
   const [nama, setNama] = useState('');
   const [lembaga, setLembaga] = useState('');
 
@@ -24,17 +30,22 @@ export default function IdentityForm({ onSubmit }) {
             placeholder="Masukkan nama lengkap Anda"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-slate-400 mb-2">Asal Lembaga / Utusan</label>
-          <input 
-            type="text" 
-            required 
-            value={lembaga} 
-            onChange={(e) => setLembaga(e.target.value)} 
-            className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors"
-            placeholder="Masukkan asal lembaga/instansi"
-          />
-        </div>
+        
+        {!hideLembaga && (
+          <div>
+            <label className="block text-sm font-medium text-slate-400 mb-2">
+              {lembagaLabel} {!lembagaRequired && <span className="text-slate-500 text-xs ml-1">(Opsional)</span>}
+            </label>
+            <input 
+              type="text" 
+              required={lembagaRequired}
+              value={lembaga} 
+              onChange={(e) => setLembaga(e.target.value)} 
+              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 transition-colors"
+              placeholder={lembagaPlaceholder}
+            />
+          </div>
+        )}
       </div>
       <button 
         type="submit" 
