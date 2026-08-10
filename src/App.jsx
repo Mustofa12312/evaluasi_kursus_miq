@@ -11,7 +11,7 @@ import PanitiaForm from './pages/public/PanitiaForm';
 import NotFound from './pages/public/NotFound';
 import Login from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
-import EvaluasiPeserta from './pages/admin/EvaluasiPeserta';
+import EvaluasiList from './pages/admin/EvaluasiList';
 import KritikSaran from './pages/admin/KritikSaran';
 import Analisis from './pages/admin/Analisis';
 import ActionPlan from './pages/admin/ActionPlan';
@@ -41,8 +41,10 @@ function App() {
           {/* Admin Protected Routes */}
           <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
             <Route index element={<AdminDashboard />} />
-            <Route path="evaluasi/peserta" element={<EvaluasiPeserta />} />
-            <Route path="evaluasi/pendamping" element={<div className="py-12 text-center text-muted">Data Evaluasi Pendamping (WIP)</div>} />
+            <Route path="evaluasi/peserta" element={<EvaluasiList role="peserta" title="Peserta" />} />
+            <Route path="evaluasi/pendamping" element={<EvaluasiList role="pendamping" title="Pendamping" />} />
+            <Route path="evaluasi/muallim" element={<EvaluasiList role="muallim" title="Muallim" />} />
+            <Route path="evaluasi/panitia" element={<EvaluasiList role="panitia" title="Panitia" />} />
             <Route path="kritik-saran" element={<KritikSaran />} />
             <Route path="analisis" element={<Analisis />} />
             <Route path="master-pertanyaan" element={<MasterPertanyaan />} />
