@@ -3,6 +3,9 @@ import PublicLayout from './components/layout/PublicLayout';
 import AdminLayout from './components/layout/AdminLayout';
 import Home from './pages/public/Home';
 import PesertaForm from './pages/public/PesertaForm';
+import PendampingForm from './pages/public/PendampingForm';
+import MuallimForm from './pages/public/MuallimForm';
+import PanitiaForm from './pages/public/PanitiaForm';
 import AdminDashboard from './pages/admin/Dashboard';
 import EvaluasiPeserta from './pages/admin/EvaluasiPeserta';
 import KritikSaran from './pages/admin/KritikSaran';
@@ -17,9 +20,9 @@ function App() {
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<Home />} />
           <Route path="evaluasi/peserta" element={<PesertaForm />} />
-          <Route path="evaluasi/pendamping" element={<div className="container mt-8 text-center">Form Pendamping (WIP)</div>} />
-          <Route path="evaluasi/muallim" element={<div className="container mt-8 text-center">Form Muallim (WIP)</div>} />
-          <Route path="evaluasi/panitia" element={<div className="container mt-8 text-center">Form Panitia (WIP)</div>} />
+          <Route path="evaluasi/pendamping" element={<PendampingForm />} />
+          <Route path="evaluasi/muallim" element={<MuallimForm />} />
+          <Route path="evaluasi/panitia" element={<PanitiaForm />} />
         </Route>
 
         {/* Admin Routes */}
