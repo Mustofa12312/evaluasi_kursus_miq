@@ -104,6 +104,17 @@ export const getQuestionsByRole = async (role) => {
   }
 };
 
+export const getAllQuestions = async () => {
+  try {
+    const q = query(collection(db, "questions"));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ _docId: doc.id, ...doc.data() }));
+  } catch (err) {
+    console.error("Error getAllQuestions:", err);
+    return mockQuestions;
+  }
+};
+
 export const submitEvaluation = async (evaluationData) => {
   // Fetch active period
   const periodsQuery = query(collection(db, 'periods'), where('isActive', '==', true));
@@ -270,6 +281,19 @@ export const updateMasterData = async (collectionName, id, data) => {
 };
 
 export const deleteMasterData = async (collectionName, id) => {
+  // Cascade Validation
+  if (collectionName === 'programs') {
+    const q = query(collection(db, 'classes'), where('programId', '==', id));
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) throw new Error("PROGRAM_IN_USE");
+  }
+  
+  if (collectionName === 'classes') {
+    const q = query(collection(db, 'muallims'), where('classId', '==', id));
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) throw new Error("CLASS_IN_USE");
+  }
+
   const docRef = doc(db, collectionName, id);
   await deleteDoc(docRef);
 };

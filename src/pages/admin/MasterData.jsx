@@ -60,7 +60,13 @@ export default function MasterData() {
         setDataList(dataList.filter(d => d._docId !== id));
       } catch (err) {
         console.error(err);
-        alert("Gagal menghapus data.");
+        if (err.message === "PROGRAM_IN_USE") {
+          alert("Peringatan: Tidak dapat menghapus Program karena masih memiliki Kelas yang aktif di dalamnya. Hapus Kelasnya terlebih dahulu.");
+        } else if (err.message === "CLASS_IN_USE") {
+          alert("Peringatan: Tidak dapat menghapus Kelas karena masih memiliki Muallim yang aktif di dalamnya. Hapus Muallimnya terlebih dahulu.");
+        } else {
+          alert("Gagal menghapus data.");
+        }
       }
     }
   };
