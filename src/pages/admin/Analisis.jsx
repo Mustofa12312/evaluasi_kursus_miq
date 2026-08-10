@@ -1,18 +1,49 @@
 import { useState, useEffect } from 'react';
 import { getResponsesByRole } from '../../services/db';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { AlertCircle, TrendingUp } from 'lucide-react';
+import { AlertCircle, TrendingUp, Download } from 'lucide-react';
+import { usePeriod } from '../../context/PeriodContext';
+import * as XLSX from 'xlsx';
 
 export default function Analisis() {
   const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { selectedPeriod, periods } = usePeriod();
 
   useEffect(() => {
-    getResponsesByRole('peserta').then(data => {
+    setLoading(true);
+    getResponsesByRole('peserta', selectedPeriod).then(data => {
       setResponses(data);
       setLoading(false);
     });
-  }, []);
+  }, [selectedPeriod]);
+
+  const handleExportExcel = () => {
+    if (responses.length === 0) {
+      alert("Tidak ada data untuk di-export pada periode ini.");
+      return;
+    }
+
+    const currentPeriodName = periods.find(p => p._docId === selectedPeriod)?.name || 'Semua_Periode';
+
+    // Format data for Excel
+    const excelData = responses.map((r, index) => {
+      const row = { No: index + 1, Role: r.role, Waktu: new Date(r.submittedAt || r.serverTimestamp).toLocaleString() };
+      
+      // Flatten answers
+      if (r.answers) {
+        Object.keys(r.answers).forEach(qId => {
+          row[qId] = r.answers[qId];
+        });
+      }
+      return row;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "RawData");
+    XLSX.writeFile(workbook, `Evaluasi_${currentPeriodName}.xlsx`);
+  };
 
   if (loading) return <div className="py-12 text-center text-muted">Memuat analisis data...</div>;
 
@@ -37,8 +68,18 @@ export default function Analisis() {
 
   return (
     <div className="animate-fade-in pb-12">
-      <h1 className="text-3xl font-display mb-2">Analisis Mendalam</h1>
-      <p className="text-muted mb-8">Interpretasi data kualitatif dan kuantitatif dari seluruh responden.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-3xl font-display mb-2">Analisis Mendalam</h1>
+          <p className="text-muted">Interpretasi data kualitatif dan kuantitatif dari seluruh responden.</p>
+        </div>
+        <button 
+          onClick={handleExportExcel}
+          className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all shrink-0"
+        >
+          <Download size={18} /> Unduh Raw Data (Excel)
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <div className="glass-panel p-6">

@@ -1,11 +1,13 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Shield, Home, LayoutDashboard, Users, UserCheck, MessageSquare, TrendingUp, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { usePeriod } from '../../context/PeriodContext';
 
 export default function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { periods, selectedPeriod, setSelectedPeriod } = usePeriod();
   
   const getLinkClass = (path) => {
     const isActive = location.pathname === path;
@@ -47,6 +49,12 @@ export default function AdminLayout() {
           <Link to="/admin/kritik-saran" className={getLinkClass('/admin/kritik-saran')}><MessageSquare size={20} /> Kritik & Saran</Link>
           
           <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-6 mb-2 ml-4">Pengaturan (Master)</div>
+          <Link to="/admin/master-data" className={getLinkClass('/admin/master-data')}>
+            <div className="w-5 h-5 rounded-md bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
+            </div> 
+            Data Dasar & Periode
+          </Link>
           <Link to="/admin/master-pertanyaan" className={getLinkClass('/admin/master-pertanyaan')}>
             <div className="w-5 h-5 rounded-md bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center">
               <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
@@ -77,11 +85,30 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 p-8 lg:p-12 h-screen overflow-y-auto relative">
-        {/* Background ambient light */}
-        <div className="absolute top-0 right-0 w-1/2 h-96 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
-        <div className="max-w-7xl mx-auto">
-          <Outlet />
+      <main className="flex-1 h-screen overflow-y-auto relative flex flex-col">
+        {/* Top Header / Period Selector */}
+        <header className="px-8 py-4 bg-slate-900/50 backdrop-blur-md border-b border-slate-800 flex justify-end items-center sticky top-0 z-30">
+          <div className="flex items-center gap-3 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 shadow-sm">
+            <span className="text-sm font-medium text-slate-400">Periode Aktif:</span>
+            <select 
+              value={selectedPeriod || ''}
+              onChange={(e) => setSelectedPeriod(e.target.value)}
+              className="bg-transparent text-emerald-400 font-bold focus:outline-none appearance-none cursor-pointer pr-4"
+            >
+              {periods.map(p => (
+                <option key={p._docId} value={p._docId} className="bg-slate-800 text-white">{p.name}</option>
+              ))}
+            </select>
+          </div>
+        </header>
+
+        {/* Content */}
+        <div className="p-8 lg:p-12 flex-1 relative">
+          {/* Background ambient light */}
+          <div className="absolute top-0 right-0 w-1/2 h-96 bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+          <div className="max-w-7xl mx-auto">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>

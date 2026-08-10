@@ -2,18 +2,23 @@ import { useState, useEffect } from 'react';
 import { getDashboardStats, seedMasterData } from '../../services/db';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Users, UserCheck, BookOpen, Settings, Target, Database } from 'lucide-react';
+import { usePeriod } from '../../context/PeriodContext';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
+  const { selectedPeriod } = usePeriod();
 
   useEffect(() => {
-    getDashboardStats().then(data => {
+    // If selectedPeriod is null but periods are still loading, wait.
+    // We assume if selectedPeriod changes, we refetch.
+    setLoading(true);
+    getDashboardStats(selectedPeriod).then(data => {
       setStats(data);
       setLoading(false);
     });
-  }, []);
+  }, [selectedPeriod]);
 
   const handleSeed = async () => {
     if(window.confirm("Apakah Anda yakin ingin menyuntikkan Master Data ke Firebase? (Hanya lakukan jika database kosong)")){

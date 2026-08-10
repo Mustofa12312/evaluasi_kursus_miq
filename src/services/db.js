@@ -84,8 +84,17 @@ export const getQuestionsByRole = async (role) => {
 };
 
 export const submitEvaluation = async (evaluationData) => {
+  // Fetch active period
+  const periodsQuery = query(collection(db, 'periods'), where('isActive', '==', true));
+  const periodsSnapshot = await getDocs(periodsQuery);
+  let activePeriodId = "legacy_no_period";
+  if (!periodsSnapshot.empty) {
+    activePeriodId = periodsSnapshot.docs[0].id;
+  }
+
   const finalData = {
     ...evaluationData,
+    periodeId: activePeriodId,
     submittedAt: new Date().toISOString(), // Fallback
     serverTimestamp: serverTimestamp() // Better sorting
   };
@@ -101,8 +110,13 @@ export const getResponsesByRole = async (role) => {
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
-export const getDashboardStats = async () => {
-  const querySnapshot = await getDocs(collection(db, "evaluations"));
+export const getDashboardStats = async (periodId = null) => {
+  let q = query(collection(db, "evaluations"));
+  if (periodId) {
+    q = query(collection(db, "evaluations"), where("periodeId", "==", periodId));
+  }
+  
+  const querySnapshot = await getDocs(q);
   const allResponses = querySnapshot.docs.map(doc => doc.data());
   
   const totalResponden = allResponses.length;
@@ -204,5 +218,28 @@ export const updateQuestion = async (id, data) => {
 
 export const deleteQuestion = async (id) => {
   const docRef = doc(db, "questions", id);
+  await deleteDoc(docRef);
+};
+
+// --- GENERIC MASTER DATA CRUD ---
+// Koleksi yang didukung: 'programs', 'classes', 'muallims', 'periods'
+
+export const getMasterData = async (collectionName) => {
+  const querySnapshot = await getDocs(collection(db, collectionName));
+  return querySnapshot.docs.map(doc => ({ _docId: doc.id, ...doc.data() }));
+};
+
+export const addMasterData = async (collectionName, data) => {
+  const docRef = await addDoc(collection(db, collectionName), data);
+  return { _docId: docRef.id, ...data };
+};
+
+export const updateMasterData = async (collectionName, id, data) => {
+  const docRef = doc(db, collectionName, id);
+  await updateDoc(docRef, data);
+};
+
+export const deleteMasterData = async (collectionName, id) => {
+  const docRef = doc(db, collectionName, id);
   await deleteDoc(docRef);
 };

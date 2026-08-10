@@ -16,12 +16,15 @@ import KritikSaran from './pages/admin/KritikSaran';
 import Analisis from './pages/admin/Analisis';
 import ActionPlan from './pages/admin/ActionPlan';
 import MasterPertanyaan from './pages/admin/MasterPertanyaan';
+import MasterData from './pages/admin/MasterData';
+import { PeriodProvider } from './context/PeriodContext';
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
+      <PeriodProvider>
+        <Router>
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<PublicLayout />}>
             <Route index element={<Home />} />
@@ -43,10 +46,12 @@ function App() {
             <Route path="kritik-saran" element={<KritikSaran />} />
             <Route path="analisis" element={<Analisis />} />
             <Route path="master-pertanyaan" element={<MasterPertanyaan />} />
+            <Route path="master-data" element={<MasterData />} />
             <Route path="action-plan" element={<ActionPlan />} />
           </Route>
         </Routes>
-      </Router>
+        </Router>
+      </PeriodProvider>
     </AuthProvider>
   );
 }
