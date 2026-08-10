@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getMasterData, addMasterData, updateMasterData, deleteMasterData } from '../../services/db';
-import { Settings, Plus, Edit2, Trash2, Tag, Book, UserCircle, Calendar } from 'lucide-react';
+import { Settings, Plus, Edit2, Trash2, Tag, Book, UserCircle, Calendar, Download, Upload, FileDown } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 export default function MasterData() {
   const [dataList, setDataList] = useState([]);
@@ -14,6 +15,7 @@ export default function MasterData() {
   // Form State
   const [formData, setFormData] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef(null);
 
   const tabs = [
     { id: 'periods', label: 'Tahun Ajaran', icon: Calendar },
@@ -95,6 +97,70 @@ export default function MasterData() {
     }
   };
 
+  const handleExport = () => {
+    if (dataList.length === 0) {
+      alert("Tidak ada data untuk di-export.");
+      return;
+    }
+    const excelData = dataList.map(item => ({
+      ID: item.id,
+      Nama: item.name
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+    XLSX.writeFile(workbook, `Data_${activeTab}.xlsx`);
+  };
+
+  const handleDownloadTemplate = () => {
+    const templateData = [{ ID: 'contoh_id', Nama: 'Contoh Nama' }];
+    const worksheet = XLSX.utils.json_to_sheet(templateData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
+    XLSX.writeFile(workbook, `Template_Import_${activeTab}.xlsx`);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (evt) => {
+      try {
+        setLoading(true);
+        const bstr = evt.target.result;
+        const workbook = XLSX.read(bstr, { type: 'binary' });
+        const wsname = workbook.SheetNames[0];
+        const ws = workbook.Sheets[wsname];
+        const data = XLSX.utils.sheet_to_json(ws);
+
+        let successCount = 0;
+        for (const row of data) {
+          if (row.ID && row.Nama) {
+            // Clean ID string
+            const safeId = String(row.ID).toLowerCase().replace(/\s+/g, '_');
+            await addMasterData(activeTab, { id: safeId, name: String(row.Nama) });
+            successCount++;
+          }
+        }
+        alert(`Berhasil mengimpor ${successCount} data.`);
+        fetchData(); // Refresh list
+      } catch (err) {
+        console.error(err);
+        alert("Gagal mengimpor file. Pastikan format sesuai template.");
+      } finally {
+        setLoading(false);
+        // Reset file input
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    };
+    reader.readAsBinaryString(file);
+  };
+
   return (
     <div className="animate-slide-up opacity-0 fill-mode-forwards pb-12">
       <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -102,12 +168,28 @@ export default function MasterData() {
           <h1 className="text-4xl font-display font-bold text-white mb-2">Master <span className="text-emerald-400">Data</span></h1>
           <p className="text-slate-400 text-lg">Kelola referensi entitas dasar sistem evaluasi.</p>
         </div>
-        <button 
-          onClick={handleOpenAdd}
-          className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all"
-        >
-          <Plus size={18} /> Tambah {tabs.find(t=>t.id===activeTab)?.label}
-        </button>
+        <div className="flex flex-wrap gap-2 justify-end">
+          {activeTab !== 'periods' && (
+            <>
+              <input type="file" accept=".xlsx, .xls" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
+              <button onClick={handleDownloadTemplate} className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl border border-slate-700 transition-colors">
+                <FileDown size={18} /> Template
+              </button>
+              <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl border border-slate-700 transition-colors">
+                <Download size={18} /> Export
+              </button>
+              <button onClick={handleImportClick} className="flex items-center gap-2 px-4 py-2 bg-sky-500/20 hover:bg-sky-500/30 text-sky-400 font-medium rounded-xl border border-sky-500/30 transition-colors">
+                <Upload size={18} /> Import
+              </button>
+            </>
+          )}
+          <button 
+            onClick={handleOpenAdd}
+            className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all"
+          >
+            <Plus size={18} /> Tambah {tabs.find(t=>t.id===activeTab)?.label}
+          </button>
+        </div>
       </div>
 
       <div className="bg-slate-800/40 backdrop-blur-md rounded-3xl border border-slate-700/50 shadow-xl overflow-hidden">
