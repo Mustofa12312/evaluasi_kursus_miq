@@ -26,7 +26,7 @@ export default function DynamicForm({ questions, onSubmit, onBack, loading }) {
                 <input
                   type="radio"
                   value={val}
-                  {...register(q.id, { required: q.required ? "Wajib diisi" : false })}
+                  {...register(q.id || q._docId, { required: q.required ? "Wajib diisi" : false })}
                   className="peer sr-only"
                 />
                 <div className="text-center py-3 sm:py-4 rounded-xl border-2 border-slate-700/50 bg-slate-800/40 text-slate-300 font-bold transition-all duration-300 
@@ -43,7 +43,7 @@ export default function DynamicForm({ questions, onSubmit, onBack, loading }) {
           <div className="flex gap-6 mt-4">
             <label className="flex items-center gap-3 cursor-pointer group">
               <div className="relative flex items-center justify-center w-6 h-6">
-                <input type="radio" value="yes" {...register(q.id, { required: q.required ? "Wajib diisi" : false })} className="peer sr-only" />
+                <input type="radio" value="yes" {...register(q.id || q._docId, { required: q.required ? "Wajib diisi" : false })} className="peer sr-only" />
                 <div className="w-6 h-6 rounded-full border-2 border-slate-600 group-hover:border-emerald-400 peer-checked:border-emerald-500 transition-colors"></div>
                 <div className="absolute w-3 h-3 rounded-full bg-emerald-500 scale-0 peer-checked:scale-100 transition-transform"></div>
               </div>
@@ -51,7 +51,7 @@ export default function DynamicForm({ questions, onSubmit, onBack, loading }) {
             </label>
             <label className="flex items-center gap-3 cursor-pointer group">
               <div className="relative flex items-center justify-center w-6 h-6">
-                <input type="radio" value="no" {...register(q.id, { required: q.required ? "Wajib diisi" : false })} className="peer sr-only" />
+                <input type="radio" value="no" {...register(q.id || q._docId, { required: q.required ? "Wajib diisi" : false })} className="peer sr-only" />
                 <div className="w-6 h-6 rounded-full border-2 border-slate-600 group-hover:border-rose-400 peer-checked:border-rose-500 transition-colors"></div>
                 <div className="absolute w-3 h-3 rounded-full bg-rose-500 scale-0 peer-checked:scale-100 transition-transform"></div>
               </div>
@@ -63,7 +63,7 @@ export default function DynamicForm({ questions, onSubmit, onBack, loading }) {
       default:
         return (
           <textarea
-            {...register(q.id, { required: q.required ? "Wajib diisi" : false })}
+            {...register(q.id || q._docId, { required: q.required ? "Wajib diisi" : false })}
             className="w-full mt-4 bg-slate-900/50 border border-slate-700 rounded-xl p-4 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
             rows="4"
             placeholder="Tuliskan pendapat atau saran Anda di sini..."
@@ -75,7 +75,7 @@ export default function DynamicForm({ questions, onSubmit, onBack, loading }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="animate-slide-up opacity-0 fill-mode-forwards space-y-8 max-w-3xl mx-auto pb-8">
       {questions.map((q, index) => (
-        <div key={q.id} className="bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 md:p-8 shadow-lg">
+        <div key={q.id || q._docId} className="bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 md:p-8 shadow-lg">
           <label className="block text-lg md:text-xl font-medium text-slate-200 leading-snug">
             <span className="inline-block w-8 h-8 text-center bg-emerald-500/20 text-emerald-400 rounded-lg mr-3 text-sm leading-8">{index + 1}</span> 
             {q.text}
@@ -84,10 +84,10 @@ export default function DynamicForm({ questions, onSubmit, onBack, loading }) {
           
           {renderInput(q)}
           
-          {errors[q.id] && (
+          {errors[q.id || q._docId] && (
             <p className="text-rose-400 text-sm mt-3 flex items-center gap-1">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              {errors[q.id].message}
+              {errors[q.id || q._docId].message}
             </p>
           )}
         </div>

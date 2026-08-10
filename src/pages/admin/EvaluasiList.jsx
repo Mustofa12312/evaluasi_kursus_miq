@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { getResponsesByRole } from '../../services/db';
+import { getResponsesByRole, deleteEvaluation } from '../../services/db';
 import ExportButton from '../../components/admin/ExportButton';
 import { usePeriod } from '../../context/PeriodContext';
+import { Trash2 } from 'lucide-react';
 
 export default function EvaluasiList({ role, title }) {
   const [responses, setResponses] = useState([]);
@@ -20,6 +21,17 @@ export default function EvaluasiList({ role, title }) {
 
   const currentPeriodName = periods.find(p => p._docId === selectedPeriod)?.name || 'Semua_Periode';
   const fileName = `Laporan_${title}_${currentPeriodName}`;
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus data evaluasi ini?")) {
+      try {
+        await deleteEvaluation(id);
+        setResponses(responses.filter(r => (r._docId || r.id) !== id));
+      } catch (error) {
+        alert("Gagal menghapus evaluasi.");
+      }
+    }
+  };
 
   return (
     <div className="animate-fade-in">
@@ -42,6 +54,7 @@ export default function EvaluasiList({ role, title }) {
               <th className="p-4 border-b border-border">Tanggal Submit</th>
               <th className="p-4 border-b border-border text-center">Skor Akhir (Contoh)</th>
               <th className="p-4 border-b border-border">Kritik / Saran Singkat</th>
+              <th className="p-4 border-b border-border text-right">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -57,11 +70,20 @@ export default function EvaluasiList({ role, title }) {
                 <td className="p-4 border-b border-border text-sm max-w-xs truncate">
                   {res.answers ? Object.values(res.answers).find(v => typeof v === 'string' && v.length > 10) || '-' : '-'}
                 </td>
+                <td className="p-4 border-b border-border text-right">
+                  <button 
+                    onClick={() => handleDelete(res._docId || res.id)} 
+                    className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
+                    title="Hapus Data"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </td>
               </tr>
             ))}
             {responses.length === 0 && (
               <tr>
-                <td colSpan="4" className="p-8 text-center text-muted">Belum ada data evaluasi {title.toLowerCase()} pada periode ini.</td>
+                <td colSpan="5" className="p-8 text-center text-muted">Belum ada data evaluasi {title.toLowerCase()} pada periode ini.</td>
               </tr>
             )}
           </tbody>

@@ -131,6 +131,15 @@ export const getResponsesByRole = async (role) => {
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
+export const deleteEvaluation = async (evaluationId) => {
+  try {
+    await deleteDoc(doc(db, "evaluations", evaluationId));
+  } catch (error) {
+    console.error("Error deleting evaluation:", error);
+    throw error;
+  }
+};
+
 export const getDashboardStats = async (periodId = null) => {
   let q = query(collection(db, "evaluations"));
   if (periodId) {
