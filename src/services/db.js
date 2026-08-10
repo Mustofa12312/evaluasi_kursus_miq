@@ -30,7 +30,21 @@ const mockQuestions = [
   { id: 'q_p_5', role: 'peserta', category: 'keseluruhan', type: 'rating', text: 'Secara keseluruhan, seberapa puas Anda mengikuti Kursus Tartil Al-Qur\'an se-Madura?', required: true, order: 5 },
   { id: 'q_p_6', role: 'peserta', category: 'kritik_saran', type: 'text', text: 'Apa hal terbaik dari kursus ini yang menurut Anda harus dipertahankan tahun depan?', required: false, order: 6 },
   { id: 'q_p_7', role: 'peserta', category: 'kritik_saran', type: 'text', text: 'Apa hal yang menurut Anda paling perlu diperbaiki?', required: false, order: 7 },
-  { id: 'q_p_8', role: 'peserta', category: 'keseluruhan', type: 'boolean', text: 'Jika kursus ini dilaksanakan kembali tahun depan, apakah Anda bersedia mengikuti kembali?', required: true, order: 8 }
+  { id: 'q_p_8', role: 'peserta', category: 'keseluruhan', type: 'boolean', text: 'Jika kursus ini dilaksanakan kembali tahun depan, apakah Anda bersedia mengikuti kembali?', required: true, order: 8 },
+  
+  // Pertanyaan Pendamping
+  { id: 'q_pend_1', role: 'pendamping', category: 'fasilitas', type: 'rating', text: 'Ketersediaan dan kelayakan fasilitas ruang kelas yang disediakan panitia sangat baik.', required: true, order: 1 },
+  { id: 'q_pend_2', role: 'pendamping', category: 'koordinasi', type: 'rating', text: 'Koordinasi antara panitia dan pendamping berjalan dengan lancar.', required: true, order: 2 },
+  { id: 'q_pend_3', role: 'pendamping', category: 'keseluruhan', type: 'text', text: 'Adakah kendala spesifik yang rombongan Anda hadapi selama mengikuti kursus?', required: false, order: 3 },
+  
+  // Pertanyaan Muallim
+  { id: 'q_mual_1', role: 'muallim', category: 'peserta', type: 'rating', text: 'Peserta menunjukkan antusiasme dan keaktifan selama proses pembelajaran.', required: true, order: 1 },
+  { id: 'q_mual_2', role: 'muallim', category: 'kurikulum', type: 'rating', text: 'Modul/Materi yang disediakan sesuai dengan kebutuhan mengajar di kelas.', required: true, order: 2 },
+  { id: 'q_mual_3', role: 'muallim', category: 'kritik_saran', type: 'text', text: 'Saran untuk perbaikan kurikulum/metode tahun depan:', required: false, order: 3 },
+  
+  // Pertanyaan Panitia
+  { id: 'q_pan_1', role: 'panitia', category: 'pelaksanaan', type: 'rating', text: 'Penyelenggaraan acara secara keseluruhan berjalan sesuai dengan standar operasional prosedur (SOP).', required: true, order: 1 },
+  { id: 'q_pan_2', role: 'panitia', category: 'internal', type: 'text', text: 'Evaluasi kritis terhadap kinerja divisi internal Anda:', required: true, order: 2 }
 ];
 
 // Simulasi Network Delay
