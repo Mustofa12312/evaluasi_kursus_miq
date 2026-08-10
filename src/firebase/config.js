@@ -19,3 +19,19 @@ export const db = getFirestore(app);
 
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
+
+// Initialize App Check (Debug Mode untuk Local Development)
+if (typeof window !== "undefined") {
+  // Hanya jalankan app check jika ada environment variable ReCaptcha atau jika di localhost
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true; // Hapus atau jadikan false untuk production nyata
+  import('firebase/app-check').then(({ initializeAppCheck, ReCaptchaV3Provider }) => {
+    try {
+      initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider('6Ld_dummy_site_key_for_dev_mode_only'),
+        isTokenAutoRefreshEnabled: true
+      });
+    } catch (e) {
+      console.warn("App Check failed to initialize (ignored in dev):", e);
+    }
+  }).catch(e => console.warn("Failed to load app-check module:", e));
+}

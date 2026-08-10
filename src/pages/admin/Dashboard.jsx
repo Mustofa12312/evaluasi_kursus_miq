@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { getDashboardStats } from '../../services/db';
+import { getDashboardStats, seedMasterData } from '../../services/db';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Users, UserCheck, BookOpen, Settings, Target } from 'lucide-react';
+import { Users, UserCheck, BookOpen, Settings, Target, Database } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [seeding, setSeeding] = useState(false);
 
   useEffect(() => {
     getDashboardStats().then(data => {
@@ -13,6 +14,15 @@ export default function AdminDashboard() {
       setLoading(false);
     });
   }, []);
+
+  const handleSeed = async () => {
+    if(window.confirm("Apakah Anda yakin ingin menyuntikkan Master Data ke Firebase? (Hanya lakukan jika database kosong)")){
+      setSeeding(true);
+      await seedMasterData();
+      setSeeding(false);
+      window.location.reload();
+    }
+  };
 
   if (loading) {
     return (
@@ -26,10 +36,20 @@ export default function AdminDashboard() {
   const colors = ['#10b981', '#38bdf8', '#c084fc', '#f59e0b'];
 
   return (
-    <div className="animate-slide-up opacity-0 fill-mode-forwards">
-      <div className="mb-10">
-        <h1 className="text-4xl font-display font-bold text-white mb-2">Dashboard <span className="text-emerald-400">Overview</span></h1>
-        <p className="text-slate-400 text-lg">Ringkasan agregat data evaluasi Kursus Tartil Al-Qur'an secara real-time.</p>
+    <div className="animate-slide-up opacity-0 fill-mode-forwards pb-12">
+      <div className="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-display font-bold text-white mb-2">Overview <span className="text-emerald-400">Dasbor</span></h1>
+          <p className="text-slate-400 text-lg">Pantauan langsung (real-time) evaluasi kursus dari seluruh peran.</p>
+        </div>
+        <button 
+          onClick={handleSeed}
+          disabled={seeding}
+          className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-lg text-sm transition-colors"
+        >
+          <Database size={16} className="text-emerald-400" />
+          {seeding ? 'Memproses...' : 'Inject Data Awal'}
+        </button>
       </div>
       
       {/* Premium Metrics Row */}

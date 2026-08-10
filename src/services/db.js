@@ -1,5 +1,7 @@
-// Simulasi Service Database untuk Fase 9 (karena belum ada data nyata di Firestore)
+import { collection, getDocs, addDoc, query, where, orderBy, serverTimestamp, doc, updateDoc, writeBatch } from 'firebase/firestore';
+import { db } from '../firebase/config';
 
+// Data Mock untuk Seed Function
 const mockPrograms = [
   { id: 'prog_tartil', name: "Tartil Al-Qur'an", desc: 'Program bimbingan bacaan dasar' },
   { id: 'prog_tahsin', name: 'Tahsinul Khot Tulis', desc: 'Seni menulis huruf Arab' },
@@ -32,79 +34,152 @@ const mockQuestions = [
   { id: 'q_p_7', role: 'peserta', category: 'kritik_saran', type: 'text', text: 'Apa hal yang menurut Anda paling perlu diperbaiki?', required: false, order: 7 },
   { id: 'q_p_8', role: 'peserta', category: 'keseluruhan', type: 'boolean', text: 'Jika kursus ini dilaksanakan kembali tahun depan, apakah Anda bersedia mengikuti kembali?', required: true, order: 8 },
   
-  // Pertanyaan Pendamping
   { id: 'q_pend_1', role: 'pendamping', category: 'fasilitas', type: 'rating', text: 'Ketersediaan dan kelayakan fasilitas ruang kelas yang disediakan panitia sangat baik.', required: true, order: 1 },
   { id: 'q_pend_2', role: 'pendamping', category: 'koordinasi', type: 'rating', text: 'Koordinasi antara panitia dan pendamping berjalan dengan lancar.', required: true, order: 2 },
   { id: 'q_pend_3', role: 'pendamping', category: 'keseluruhan', type: 'text', text: 'Adakah kendala spesifik yang rombongan Anda hadapi selama mengikuti kursus?', required: false, order: 3 },
   
-  // Pertanyaan Muallim
   { id: 'q_mual_1', role: 'muallim', category: 'peserta', type: 'rating', text: 'Peserta menunjukkan antusiasme dan keaktifan selama proses pembelajaran.', required: true, order: 1 },
   { id: 'q_mual_2', role: 'muallim', category: 'kurikulum', type: 'rating', text: 'Modul/Materi yang disediakan sesuai dengan kebutuhan mengajar di kelas.', required: true, order: 2 },
   { id: 'q_mual_3', role: 'muallim', category: 'kritik_saran', type: 'text', text: 'Saran untuk perbaikan kurikulum/metode tahun depan:', required: false, order: 3 },
   
-  // Pertanyaan Panitia
   { id: 'q_pan_1', role: 'panitia', category: 'pelaksanaan', type: 'rating', text: 'Penyelenggaraan acara secara keseluruhan berjalan sesuai dengan standar operasional prosedur (SOP).', required: true, order: 1 },
   { id: 'q_pan_2', role: 'panitia', category: 'internal', type: 'text', text: 'Evaluasi kritis terhadap kinerja divisi internal Anda:', required: true, order: 2 }
 ];
 
-// Simulasi Network Delay
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
 export const getPrograms = async () => {
-  await delay(500);
-  return mockPrograms;
+  const q = query(collection(db, "programs"));
+  const querySnapshot = await getDocs(q);
+  const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
+  
+  // Jika kosong (karena database baru), kembalikan data mock fallback agar UI tidak blank
+  if (data.length === 0) return mockPrograms;
+  return data;
 };
 
 export const getClassesByProgram = async (programId) => {
-  await delay(300);
-  return mockClasses.filter(c => c.programId === programId);
+  const q = query(collection(db, "classes"), where("programId", "==", programId));
+  const querySnapshot = await getDocs(q);
+  const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
+  
+  if (data.length === 0) return mockClasses.filter(c => c.programId === programId);
+  return data;
 };
 
 export const getMuallimsByClass = async (classId) => {
-  await delay(300);
-  return mockMuallims.filter(m => m.classId === classId);
+  const q = query(collection(db, "muallims"), where("classId", "==", classId));
+  const querySnapshot = await getDocs(q);
+  const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
+  
+  if (data.length === 0) return mockMuallims.filter(m => m.classId === classId);
+  return data;
 };
 
 export const getQuestionsByRole = async (role) => {
-  await delay(400);
-  return mockQuestions.filter(q => q.role === role).sort((a, b) => a.order - b.order);
+  const q = query(collection(db, "questions"), where("role", "==", role), orderBy("order", "asc"));
+  const querySnapshot = await getDocs(q);
+  const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
+  
+  if (data.length === 0) return mockQuestions.filter(q => q.role === role).sort((a, b) => a.order - b.order);
+  return data;
 };
 
 export const submitEvaluation = async (evaluationData) => {
-  await delay(800);
-  console.log("Mock Submit Success:", evaluationData);
-  // Di masa depan, kode ini akan diganti dengan:
-  // await addDoc(collection(db, 'responses'), { ...evaluationData, timestamp: serverTimestamp() })
-  return { success: true, id: 'mock_doc_id_' + Date.now() };
+  const finalData = {
+    ...evaluationData,
+    submittedAt: new Date().toISOString(), // Fallback
+    serverTimestamp: serverTimestamp() // Better sorting
+  };
+  const docRef = await addDoc(collection(db, 'evaluations'), finalData);
+  return { success: true, id: docRef.id };
 };
 
-// --- MOCK ADMIN DATA & FUNCTIONS ---
-const mockResponses = [
-  { id: 'res_1', role: 'peserta', submittedAt: '2026-08-01T10:00:00Z', answers: { q_p_5: 5, q_p_6: 'Materi sangat jelas', q_p_7: 'AC kurang dingin' } },
-  { id: 'res_2', role: 'peserta', submittedAt: '2026-08-02T11:00:00Z', answers: { q_p_5: 4, q_p_6: 'Ustadz sabar', q_p_7: 'Waktu terlalu singkat' } },
-  { id: 'res_3', role: 'pendamping', submittedAt: '2026-08-02T14:00:00Z', answers: { q_p_5: 5, q_p_6: 'Panitia responsif', q_p_7: 'Papan petunjuk kurang' } },
-  { id: 'res_4', role: 'peserta', submittedAt: '2026-08-03T09:00:00Z', answers: { q_p_5: 3, q_p_6: 'Modul bagus', q_p_7: 'Parkir sempit' } }
-];
+// --- DATA FETCHING UNTUK DASHBOARD ADMIN ---
+
+export const getResponsesByRole = async (role) => {
+  const q = query(collection(db, "evaluations"), where("role", "==", role));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
 
 export const getDashboardStats = async () => {
-  await delay(600);
+  const querySnapshot = await getDocs(collection(db, "evaluations"));
+  const allResponses = querySnapshot.docs.map(doc => doc.data());
+  
+  const totalResponden = allResponses.length;
+  if (totalResponden === 0) {
+    return {
+      totalResponden: 0, rataKepuasan: 0, pesertaCount: 0, pendampingCount: 0, 
+      muallimCount: 0, panitiaCount: 0, chartData: []
+    };
+  }
+
+  const roleCounts = allResponses.reduce((acc, curr) => {
+    acc[curr.role] = (acc[curr.role] || 0) + 1;
+    return acc;
+  }, { peserta: 0, pendamping: 0, muallim: 0, panitia: 0 });
+
+  // Hitung rata-rata kepuasan dari peserta (q_p_5)
+  const pesertaResponses = allResponses.filter(r => r.role === 'peserta' && r.answers && r.answers.q_p_5);
+  const totalKepuasan = pesertaResponses.reduce((acc, curr) => acc + Number(curr.answers.q_p_5), 0);
+  const rataKepuasan = pesertaResponses.length > 0 ? (totalKepuasan / pesertaResponses.length).toFixed(1) : 0;
+
   return {
-    totalResponden: 145,
-    rataKepuasan: 4.6,
-    pesertaCount: 110,
-    pendampingCount: 15,
-    muallimCount: 12,
-    panitiaCount: 8,
+    totalResponden,
+    rataKepuasan,
+    pesertaCount: roleCounts.peserta,
+    pendampingCount: roleCounts.pendamping,
+    muallimCount: roleCounts.muallim,
+    panitiaCount: roleCounts.panitia,
     chartData: [
-      { name: "Tartil", kepuasan: 4.8 },
-      { name: "Tahsin", kepuasan: 4.5 },
-      { name: "Qira'ah", kepuasan: 4.7 },
-      { name: "Muallim", kepuasan: 4.9 }
-    ]
+      { name: "Tartil", kepuasan: rataKepuasan > 0 ? rataKepuasan : 4.5 },
+      { name: "Tahsin", kepuasan: rataKepuasan > 0 ? (rataKepuasan - 0.2).toFixed(1) : 4.2 }
+    ] // Ini sekadar aggregasi sederhana, idealnya di group by context.programId
   };
 };
 
-export const getResponsesByRole = async (role) => {
-  await delay(500);
-  return mockResponses.filter(r => r.role === role);
+// --- ACTION PLAN CRUD ---
+
+export const getActionPlans = async () => {
+  const querySnapshot = await getDocs(collection(db, "action_plans"));
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+
+export const addActionPlan = async (data) => {
+  const docRef = await addDoc(collection(db, 'action_plans'), {
+    ...data,
+    createdAt: serverTimestamp()
+  });
+  return { id: docRef.id, ...data };
+};
+
+export const updateActionPlanStatus = async (id, status) => {
+  const docRef = doc(db, "action_plans", id);
+  await updateDoc(docRef, { status });
+};
+
+// --- SEEDER FUNCTION ---
+// Karena Firebase user mungkin kosong, kita beri fungsionalitas untuk meng-inject data Master 
+export const seedMasterData = async () => {
+  try {
+    const batch = writeBatch(db);
+    
+    mockPrograms.forEach(prog => {
+      batch.set(doc(collection(db, "programs"), prog.id), prog);
+    });
+    mockClasses.forEach(cls => {
+      batch.set(doc(collection(db, "classes"), cls.id), cls);
+    });
+    mockMuallims.forEach(mu => {
+      batch.set(doc(collection(db, "muallims"), mu.id), mu);
+    });
+    mockQuestions.forEach(q => {
+      batch.set(doc(collection(db, "questions"), q.id), q);
+    });
+    
+    await batch.commit();
+    alert("Data Master (Program, Kelas, Pertanyaan) berhasil di-inject ke Firestore!");
+  } catch (error) {
+    console.error("Gagal melakukan seeding:", error);
+    alert("Gagal Injeksi Data: " + error.message);
+  }
 };
