@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getPrograms, getClassesByProgram, getMuallimsByClass, getQuestionsByRole, submitEvaluation } from '../../services/db';
 import SelectCard from '../../components/form/SelectCard';
 import DynamicForm from '../../components/form/DynamicForm';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, ArrowLeft } from 'lucide-react';
 
 export default function PesertaForm() {
   const navigate = useNavigate();
@@ -87,18 +87,21 @@ export default function PesertaForm() {
     }
   };
 
-  // Render Success Page directly here or use navigate
+  // Render Success Page
   if (isSuccess) {
     return (
-      <div className="container max-w-2xl text-center py-16 animate-fade-in">
-        <div className="icon-wrapper w-20 h-20 mx-auto mb-6 bg-[rgba(16,185,129,0.2)]">
-          <CheckCircle size={48} className="text-primary" />
+      <div className="max-w-2xl mx-auto text-center py-24 animate-slide-up px-4">
+        <div className="relative w-32 h-32 mx-auto mb-8 flex justify-center items-center">
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
+          <div className="relative bg-emerald-500/20 p-6 rounded-full border-2 border-emerald-500/50 backdrop-blur-md">
+            <CheckCircle size={64} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.5)]" />
+          </div>
         </div>
-        <h1 className="text-4xl text-primary font-display mb-4">Terima Kasih!</h1>
-        <p className="text-xl text-muted mb-8">
-          Evaluasi Anda telah berhasil direkam. Masukan Anda sangat berharga untuk perbaikan Kursus Tartil Al-Qur'an di masa mendatang.
+        <h1 className="text-5xl text-slate-100 font-display font-bold mb-6">Terima Kasih!</h1>
+        <p className="text-xl text-slate-400 mb-12 leading-relaxed">
+          Evaluasi Anda telah berhasil direkam. Masukan berharga Anda akan menjadi bahan perbaikan nyata untuk Kursus Tartil Al-Qur'an di masa mendatang.
         </p>
-        <button onClick={() => navigate('/')} className="btn btn-primary">
+        <button onClick={() => navigate('/')} className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-4 rounded-xl border border-slate-600 transition-colors font-medium">
           Kembali ke Beranda
         </button>
       </div>
@@ -106,31 +109,53 @@ export default function PesertaForm() {
   }
 
   return (
-    <div className="container max-w-4xl py-8">
-      {/* Progress Indicator */}
-      <div className="mb-12">
-        <h1 className="text-3xl text-center font-display mb-6">Evaluasi Peserta</h1>
-        <div className="flex justify-between items-center relative max-w-2xl mx-auto">
-          <div className="absolute top-1/2 left-0 right-0 h-1 bg-surface -z-10 -translate-y-1/2"></div>
-          <div className="absolute top-1/2 left-0 h-1 bg-primary -z-10 -translate-y-1/2 transition-all duration-300" style={{ width: `${(step - 1) * 33.33}%` }}></div>
+    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6">
+      {/* Premium Progress Indicator */}
+      <div className="mb-16">
+        <h1 className="text-4xl text-center font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-sky-400 mb-12">
+          Evaluasi Peserta
+        </h1>
+        
+        <div className="relative max-w-2xl mx-auto px-4">
+          {/* Background Track */}
+          <div className="absolute top-5 left-10 right-10 h-1.5 bg-slate-800 rounded-full -z-10"></div>
           
-          {['Program', 'Kelas', 'Muallim', 'Evaluasi'].map((label, idx) => {
-            const currentStep = idx + 1;
-            const isActive = step >= currentStep;
-            return (
-              <div key={label} className="flex flex-col items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mb-2 transition-colors ${isActive ? 'bg-primary text-white' : 'bg-surface text-muted border border-border'}`}>
-                  {currentStep}
+          {/* Active Track */}
+          <div 
+            className="absolute top-5 left-10 h-1.5 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full -z-10 transition-all duration-700 shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
+            style={{ width: `calc(${(step - 1) * 33.33}% - 20px)` }}
+          ></div>
+          
+          <div className="flex justify-between items-start">
+            {['Program', 'Kelas', 'Muallim', 'Evaluasi'].map((label, idx) => {
+              const currentStep = idx + 1;
+              const isActive = step >= currentStep;
+              const isCurrent = step === currentStep;
+              
+              return (
+                <div key={label} className="flex flex-col items-center">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold mb-3 transition-all duration-500 shadow-lg
+                    ${isActive 
+                      ? 'bg-emerald-500 text-slate-900 border-2 border-emerald-400 scale-110 shadow-emerald-500/50' 
+                      : 'bg-slate-800 text-slate-500 border-2 border-slate-700'
+                    }
+                    ${isCurrent ? 'ring-4 ring-emerald-500/20' : ''}
+                  `}>
+                    {isActive ? <CheckCircle size={20} className={isCurrent ? "opacity-0" : "opacity-100 absolute"} /> : null}
+                    <span className={isActive && !isCurrent ? "opacity-0" : "opacity-100"}>{currentStep}</span>
+                  </div>
+                  <span className={`text-sm font-medium transition-colors duration-300 ${isActive ? 'text-emerald-400' : 'text-slate-500'}`}>
+                    {label}
+                  </span>
                 </div>
-                <span className={`text-xs ${isActive ? 'text-primary' : 'text-muted'}`}>{label}</span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
 
       {/* Step Content */}
-      <div className="min-h-[400px]">
+      <div className="min-h-[500px] relative">
         {step === 1 && (
           <SelectCard 
             title="Pilih Program yang Anda Ikuti"
@@ -142,9 +167,9 @@ export default function PesertaForm() {
         )}
         
         {step === 2 && (
-          <div className="animate-fade-in">
-            <button onClick={() => setStep(1)} className="text-primary text-sm mb-4 inline-flex items-center hover:underline">
-              &larr; Kembali
+          <div className="animate-slide-up opacity-0 fill-mode-forwards">
+            <button onClick={() => setStep(1)} className="text-emerald-400 font-medium text-sm mb-6 inline-flex items-center hover:text-emerald-300 transition-colors bg-emerald-400/10 px-4 py-2 rounded-lg">
+              <ArrowLeft size={16} className="mr-2" /> Kembali ke Program
             </button>
             <SelectCard 
               title="Pilih Kelas / Kelompok Anda"
@@ -157,9 +182,9 @@ export default function PesertaForm() {
         )}
         
         {step === 3 && (
-          <div className="animate-fade-in">
-            <button onClick={() => setStep(2)} className="text-primary text-sm mb-4 inline-flex items-center hover:underline">
-              &larr; Kembali
+          <div className="animate-slide-up opacity-0 fill-mode-forwards">
+            <button onClick={() => setStep(2)} className="text-emerald-400 font-medium text-sm mb-6 inline-flex items-center hover:text-emerald-300 transition-colors bg-emerald-400/10 px-4 py-2 rounded-lg">
+              <ArrowLeft size={16} className="mr-2" /> Kembali ke Kelas
             </button>
             <SelectCard 
               title="Pilih Muallim Anda"
@@ -172,7 +197,7 @@ export default function PesertaForm() {
         )}
         
         {step === 4 && (
-          <div className="animate-fade-in">
+          <div>
             <DynamicForm 
               questions={questions}
               onSubmit={handleFormSubmit}
