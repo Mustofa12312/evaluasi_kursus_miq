@@ -8,6 +8,7 @@ import PesertaForm from './pages/public/PesertaForm';
 import PendampingForm from './pages/public/PendampingForm';
 import MuallimForm from './pages/public/MuallimForm';
 import PanitiaForm from './pages/public/PanitiaForm';
+import NotFound from './pages/public/NotFound';
 import Login from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import EvaluasiPeserta from './pages/admin/EvaluasiPeserta';
@@ -27,6 +28,7 @@ function App() {
             <Route path="evaluasi/pendamping" element={<PendampingForm />} />
             <Route path="evaluasi/muallim" element={<MuallimForm />} />
             <Route path="evaluasi/panitia" element={<PanitiaForm />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
 
           {/* Admin Login Route */}

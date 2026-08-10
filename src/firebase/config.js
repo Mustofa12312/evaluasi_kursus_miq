@@ -11,8 +11,19 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase with error handling for empty config
+let app;
+try {
+  if (!firebaseConfig.apiKey) {
+    console.error("FIREBASE CONFIG ERROR: .env file is empty! Please fill in your Firebase credentials in the .env file.");
+    // Fallback to dummy so the app doesn't crash with a blank screen immediately
+    app = initializeApp({ ...firebaseConfig, apiKey: "dummy-key", projectId: "dummy-project" });
+  } else {
+    app = initializeApp(firebaseConfig);
+  }
+} catch (error) {
+  console.error("Firebase init error:", error);
+}
 
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);

@@ -1,8 +1,11 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Shield, Home, LayoutDashboard, Users, UserCheck, MessageSquare, TrendingUp } from 'lucide-react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Shield, Home, LayoutDashboard, Users, UserCheck, MessageSquare, TrendingUp, LogOut } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 export default function AdminLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   
   const getLinkClass = (path) => {
     const isActive = location.pathname === path;
@@ -11,6 +14,15 @@ export default function AdminLayout() {
         ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)]' 
         : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-transparent hover:border-slate-700'
     }`;
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/admin/login');
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
   };
 
   return (
@@ -43,7 +55,13 @@ export default function AdminLayout() {
           </Link>
         </nav>
 
-        <div className="mt-8 pt-8 border-t border-slate-800">
+        <div className="mt-8 pt-8 border-t border-slate-800 flex flex-col gap-3">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors border border-rose-500/30 font-medium"
+          >
+            <LogOut size={18} /> Keluar (Logout)
+          </button>
           <Link to="/" className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700">
             <Home size={18} /> Kembali ke Publik
           </Link>

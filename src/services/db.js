@@ -1,4 +1,4 @@
-import { collection, getDocs, addDoc, query, where, orderBy, serverTimestamp, doc, updateDoc, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, addDoc, query, where, orderBy, serverTimestamp, doc, updateDoc, writeBatch, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
 // Data Mock untuk Seed Function
@@ -182,4 +182,30 @@ export const seedMasterData = async () => {
     console.error("Gagal melakukan seeding:", error);
     alert("Gagal Injeksi Data: " + error.message);
   }
+};
+
+// --- QUESTION BUILDER CRUD ---
+
+export const getAllQuestions = async () => {
+  const q = query(collection(db, "questions"), orderBy("order", "asc"));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({ _docId: doc.id, ...doc.data() }));
+};
+
+export const addQuestion = async (data) => {
+  const docRef = await addDoc(collection(db, 'questions'), data);
+  return { _docId: docRef.id, ...data };
+};
+
+export const updateQuestion = async (id, data) => {
+  import { deleteDoc } from 'firebase/firestore'; // We need this, I'll add it to the top later
+  const docRef = doc(db, "questions", id);
+  await updateDoc(docRef, data);
+};
+
+export const deleteQuestion = async (id) => {
+  import { deleteDoc } from 'firebase/firestore'; // We need this
+  const docRef = doc(db, "questions", id);
+  const { deleteDoc: doDelete } = await import('firebase/firestore');
+  await doDelete(docRef);
 };
