@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getQuestionsByRole, submitEvaluation } from '../../services/db';
+import { getQuestionsByRole, submitEvaluation, getSecuritySettings } from '../../services/db';
 import DynamicForm from '../../components/form/DynamicForm';
 import IdentityForm from '../../components/form/IdentityForm';
+import PinGate from '../../components/form/PinGate';
 import { CheckCircle } from 'lucide-react';
 
 export default function PanitiaForm() {
   const navigate = useNavigate();
   
+  const [step, setStep] = useState(0); // 0: PinGate, 1: Identity, 2: Form
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [pinSettings, setPinSettings] = useState({ enabled: false, pin: '' });
   
-  const [step, setStep] = useState(1);
   const [identity, setIdentity] = useState(null);
 
   const [questions, setQuestions] = useState([]);
@@ -19,8 +21,19 @@ export default function PanitiaForm() {
 
   // Fetch initial data
   useEffect(() => {
-    getQuestionsByRole('panitia').then(data => {
-      setQuestions(data);
+    Promise.all([
+      getQuestionsByRole('panitia'),
+      getSecuritySettings()
+    ]).then(([questionsData, settingsData]) => {
+      setQuestions(questionsData);
+      
+      if (settingsData && settingsData.panitia?.enabled) {
+        setPinSettings(settingsData.panitia);
+        setStep(0);
+      } else {
+        setStep(1);
+      }
+      
       setLoading(false);
     });
   }, []);
@@ -83,11 +96,19 @@ export default function PanitiaForm() {
       </div>
 
       <div className="min-h-[500px]">
+        {step === 0 && (
+          <PinGate 
+            roleName="Panitia" 
+            requiredPin={pinSettings.pin} 
+            onSuccess={() => setStep(1)} 
+          />
+        )}
         {step === 1 && (
           <IdentityForm 
             onSubmit={handleSelectIdentity} 
             lembagaLabel="Divisi atau Pengamat" 
             lembagaPlaceholder="Contoh: Divisi Acara" 
+            lembagaRequired={false}
           />
         )}
         {step === 2 && (
