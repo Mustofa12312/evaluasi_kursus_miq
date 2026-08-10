@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/layout/ProtectedRoute';
 import PublicLayout from './components/layout/PublicLayout';
 import AdminLayout from './components/layout/AdminLayout';
@@ -21,8 +22,9 @@ import { PeriodProvider } from './context/PeriodContext';
 
 function App() {
   return (
-    <AuthProvider>
-      <PeriodProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <PeriodProvider>
         <Router>
           <Routes>
           {/* Public Routes */}
@@ -53,8 +55,9 @@ function App() {
           </Route>
         </Routes>
         </Router>
-      </PeriodProvider>
-    </AuthProvider>
+        </PeriodProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
