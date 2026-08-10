@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Rahasia / File yang tidak boleh di-push
+node.md
+prd.md
+firestore.rules
