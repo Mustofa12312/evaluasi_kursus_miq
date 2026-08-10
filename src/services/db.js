@@ -63,3 +63,34 @@ export const submitEvaluation = async (evaluationData) => {
   // await addDoc(collection(db, 'responses'), { ...evaluationData, timestamp: serverTimestamp() })
   return { success: true, id: 'mock_doc_id_' + Date.now() };
 };
+
+// --- MOCK ADMIN DATA & FUNCTIONS ---
+const mockResponses = [
+  { id: 'res_1', role: 'peserta', submittedAt: '2026-08-01T10:00:00Z', answers: { q_p_5: 5, q_p_6: 'Materi sangat jelas', q_p_7: 'AC kurang dingin' } },
+  { id: 'res_2', role: 'peserta', submittedAt: '2026-08-02T11:00:00Z', answers: { q_p_5: 4, q_p_6: 'Ustadz sabar', q_p_7: 'Waktu terlalu singkat' } },
+  { id: 'res_3', role: 'pendamping', submittedAt: '2026-08-02T14:00:00Z', answers: { q_p_5: 5, q_p_6: 'Panitia responsif', q_p_7: 'Papan petunjuk kurang' } },
+  { id: 'res_4', role: 'peserta', submittedAt: '2026-08-03T09:00:00Z', answers: { q_p_5: 3, q_p_6: 'Modul bagus', q_p_7: 'Parkir sempit' } }
+];
+
+export const getDashboardStats = async () => {
+  await delay(600);
+  return {
+    totalResponden: 145,
+    rataKepuasan: 4.6,
+    pesertaCount: 110,
+    pendampingCount: 15,
+    muallimCount: 12,
+    panitiaCount: 8,
+    chartData: [
+      { name: "Tartil", kepuasan: 4.8 },
+      { name: "Tahsin", kepuasan: 4.5 },
+      { name: "Qira'ah", kepuasan: 4.7 },
+      { name: "Muallim", kepuasan: 4.9 }
+    ]
+  };
+};
+
+export const getResponsesByRole = async (role) => {
+  await delay(500);
+  return mockResponses.filter(r => r.role === role);
+};

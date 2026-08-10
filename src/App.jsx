@@ -4,6 +4,8 @@ import AdminLayout from './components/layout/AdminLayout';
 import Home from './pages/public/Home';
 import PesertaForm from './pages/public/PesertaForm';
 import AdminDashboard from './pages/admin/Dashboard';
+import EvaluasiPeserta from './pages/admin/EvaluasiPeserta';
+import KritikSaran from './pages/admin/KritikSaran';
 
 function App() {
   return (
@@ -21,9 +23,9 @@ function App() {
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
-          <Route path="evaluasi/peserta" element={<div>Data Evaluasi Peserta</div>} />
-          <Route path="evaluasi/pendamping" element={<div>Data Evaluasi Pendamping</div>} />
-          <Route path="kritik-saran" element={<div>Kritik & Saran</div>} />
+          <Route path="evaluasi/peserta" element={<EvaluasiPeserta />} />
+          <Route path="evaluasi/pendamping" element={<div className="py-12 text-center text-muted">Data Evaluasi Pendamping (WIP)</div>} />
+          <Route path="kritik-saran" element={<KritikSaran />} />
         </Route>
       </Routes>
     </Router>
