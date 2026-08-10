@@ -1,5 +1,5 @@
 import { Outlet, Link } from 'react-router-dom';
-import { Shield, Home, LayoutDashboard, Users, UserCheck, MessageSquare } from 'lucide-react';
+import { Shield, Home, LayoutDashboard, Users, UserCheck, MessageSquare, TrendingUp } from 'lucide-react';
 
 export default function AdminLayout() {
   return (
@@ -15,6 +15,7 @@ export default function AdminLayout() {
           <Link to="/admin/evaluasi/peserta" className="btn btn-outline" style={{ justifyContent: 'flex-start' }}><Users size={18} /> Evaluasi Peserta</Link>
           <Link to="/admin/evaluasi/pendamping" className="btn btn-outline" style={{ justifyContent: 'flex-start' }}><UserCheck size={18} /> Ev. Pendamping</Link>
           <Link to="/admin/kritik-saran" className="btn btn-outline" style={{ justifyContent: 'flex-start' }}><MessageSquare size={18} /> Kritik & Saran</Link>
+          <Link to="/admin/analisis" className="btn btn-outline border-primary/30" style={{ justifyContent: 'flex-start' }}><TrendingUp size={18} className="text-primary" /> Analisis Lanjutan</Link>
         </nav>
 
         <Link to="/" className="btn btn-outline mt-auto" style={{ justifyContent: 'flex-start' }}><Home size={18} /> Kembali ke Publik</Link>

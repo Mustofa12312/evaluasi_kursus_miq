@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getResponsesByRole } from '../../services/db';
+import ExportButton from '../../components/admin/ExportButton';
 
 export default function EvaluasiPeserta() {
   const [responses, setResponses] = useState([]);
@@ -16,8 +17,16 @@ export default function EvaluasiPeserta() {
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-3xl font-display mb-2">Data Evaluasi Peserta</h1>
-      <p className="text-muted mb-8">Data tabular dari respons peserta (Identitas anonim).</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-display mb-2">Data Evaluasi Peserta</h1>
+          <p className="text-muted">Data tabular dari respons peserta (Identitas anonim).</p>
+        </div>
+        <div className="flex gap-2">
+          <ExportButton data={responses} type="pdf" filename="Laporan_Peserta" />
+          <ExportButton data={responses} type="excel" filename="Data_Peserta" />
+        </div>
+      </div>
 
       <div className="glass-panel overflow-x-auto p-0">
         <table className="w-full text-left border-collapse">
