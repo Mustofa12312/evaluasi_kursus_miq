@@ -15,6 +15,7 @@ import EvaluasiPeserta from './pages/admin/EvaluasiPeserta';
 import KritikSaran from './pages/admin/KritikSaran';
 import Analisis from './pages/admin/Analisis';
 import ActionPlan from './pages/admin/ActionPlan';
+import MasterPertanyaan from './pages/admin/MasterPertanyaan';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
             <Route path="evaluasi/pendamping" element={<div className="py-12 text-center text-muted">Data Evaluasi Pendamping (WIP)</div>} />
             <Route path="kritik-saran" element={<KritikSaran />} />
             <Route path="analisis" element={<Analisis />} />
+            <Route path="master-pertanyaan" element={<MasterPertanyaan />} />
             <Route path="action-plan" element={<ActionPlan />} />
           </Route>
         </Routes>

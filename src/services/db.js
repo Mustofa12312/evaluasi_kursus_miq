@@ -198,14 +198,11 @@ export const addQuestion = async (data) => {
 };
 
 export const updateQuestion = async (id, data) => {
-  import { deleteDoc } from 'firebase/firestore'; // We need this, I'll add it to the top later
   const docRef = doc(db, "questions", id);
   await updateDoc(docRef, data);
 };
 
 export const deleteQuestion = async (id) => {
-  import { deleteDoc } from 'firebase/firestore'; // We need this
   const docRef = doc(db, "questions", id);
-  const { deleteDoc: doDelete } = await import('firebase/firestore');
-  await doDelete(docRef);
+  await deleteDoc(docRef);
 };
