@@ -12,7 +12,8 @@ const mockPrograms = [
 const mockClasses = [
   { id: 'cls_t_a', programId: 'prog_tartil', name: 'Kelas Tartil A' },
   { id: 'cls_t_b', programId: 'prog_tartil', name: 'Kelas Tartil B' },
-  { id: 'cls_k_a', programId: 'prog_tahsin', name: 'Kelas Khot A' },
+  { id: 'cls_k_a1', programId: 'prog_tahsin', name: 'Kelas A1' },
+  { id: 'cls_k_a2', programId: 'prog_tahsin', name: 'Kelas A2' },
   { id: 'cls_q_a', programId: 'prog_qiraah', name: 'Kelas Qiraah A' }
 ];
 
@@ -20,7 +21,7 @@ const mockMuallims = [
   { id: 'mu_1', classId: 'cls_t_a', name: 'Ustadz Ahmad' },
   { id: 'mu_2', classId: 'cls_t_a', name: 'Ustadz Budi' },
   { id: 'mu_3', classId: 'cls_t_b', name: 'Ustadzah Siti' },
-  { id: 'mu_4', classId: 'cls_k_a', name: 'Ustadz Hasan' },
+  { id: 'mu_4', classId: 'cls_k_a1', name: 'Ustadz Hasan' },
   { id: 'mu_5', classId: 'cls_q_a', name: 'Ustadz Zaid' }
 ];
 

@@ -12,6 +12,10 @@ export default function MasterData() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   
+  // Relational Opetions
+  const [programsList, setProgramsList] = useState([]);
+  const [classesList, setClassesList] = useState([]);
+  
   // Form State
   const [formData, setFormData] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -26,7 +30,20 @@ export default function MasterData() {
 
   useEffect(() => {
     fetchData();
+    // Load relations for dropdowns
+    loadRelations();
   }, [activeTab]);
+
+  const loadRelations = async () => {
+    try {
+      const p = await getMasterData('programs');
+      const c = await getMasterData('classes');
+      setProgramsList(p);
+      setClassesList(c);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -85,6 +102,7 @@ export default function MasterData() {
         setDataList([...dataList, added]);
       }
       setShowModal(false);
+      loadRelations(); // refresh dropdown options
     } catch (err) {
       console.error(err);
       alert("Gagal menyimpan data.");
@@ -97,8 +115,8 @@ export default function MasterData() {
     switch (tab) {
       case 'periods': return { name: '', isActive: false };
       case 'programs': return { id: '', name: '' }; // ID string based like 'tahsin'
-      case 'classes': return { id: '', name: '' };
-      case 'muallims': return { id: '', name: '' };
+      case 'classes': return { id: '', name: '', programId: '' };
+      case 'muallims': return { id: '', name: '', classId: '' };
       default: return {};
     }
   };
@@ -108,10 +126,15 @@ export default function MasterData() {
       alert("Tidak ada data untuk di-export.");
       return;
     }
-    const excelData = dataList.map(item => ({
-      ID: item.id,
-      Nama: item.name
-    }));
+    const excelData = dataList.map(item => {
+      const base = {
+        ID: item.id,
+        Nama: item.name
+      };
+      if (activeTab === 'classes') base.ProgramID = item.programId || '';
+      if (activeTab === 'muallims') base.ClassID = item.classId || '';
+      return base;
+    });
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
@@ -120,6 +143,8 @@ export default function MasterData() {
 
   const handleDownloadTemplate = () => {
     const templateData = [{ ID: 'contoh_id', Nama: 'Contoh Nama' }];
+    if (activeTab === 'classes') templateData[0].ProgramID = 'contoh_program_id';
+    if (activeTab === 'muallims') templateData[0].ClassID = 'contoh_class_id';
     const worksheet = XLSX.utils.json_to_sheet(templateData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
@@ -149,7 +174,14 @@ export default function MasterData() {
           if (row.ID && row.Nama) {
             // Clean ID string
             const safeId = String(row.ID).toLowerCase().replace(/\s+/g, '_');
-            await addMasterData(activeTab, { id: safeId, name: String(row.Nama) });
+            const newData = { id: safeId, name: String(row.Nama) };
+            if (activeTab === 'classes') {
+              newData.programId = row.ProgramID ? String(row.ProgramID).toLowerCase().replace(/\s+/g, '_') : '';
+            }
+            if (activeTab === 'muallims') {
+              newData.classId = row.ClassID ? String(row.ClassID).toLowerCase().replace(/\s+/g, '_') : '';
+            }
+            await addMasterData(activeTab, newData);
             successCount++;
           }
         }
@@ -248,7 +280,15 @@ export default function MasterData() {
                         {item.isActive ? 'Periode Aktif' : 'Tidak Aktif'}
                       </span>
                     ) : (
-                      <span className="font-mono text-xs px-2 py-1 bg-slate-800 rounded">ID: {item.id}</span>
+                      <div className="flex flex-col gap-1">
+                        <span className="font-mono text-xs px-2 py-1 bg-slate-800 rounded self-start">ID: {item.id}</span>
+                        {activeTab === 'classes' && item.programId && (
+                          <span className="text-xs text-slate-400">Prog: {item.programId}</span>
+                        )}
+                        {activeTab === 'muallims' && item.classId && (
+                          <span className="text-xs text-slate-400">Kls: {item.classId}</span>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -278,7 +318,11 @@ export default function MasterData() {
                     value={formData.id || ''} 
                     onChange={e => setFormData({...formData, id: e.target.value.toLowerCase().replace(/\s+/g, '_')})}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"
-                    placeholder="misal: tahsin_dewasa"
+                    placeholder={
+                      activeTab === 'programs' ? 'misal: tahsinul_khat' :
+                      activeTab === 'classes' ? 'misal: kelas_a1' :
+                      activeTab === 'muallims' ? 'misal: ustadz_ahmad' : 'misal: id_unik'
+                    }
                     disabled={!!editingId} // ID shouldn't change ideally
                   />
                 </div>
@@ -292,9 +336,44 @@ export default function MasterData() {
                   value={formData.name || ''} 
                   onChange={e => setFormData({...formData, name: e.target.value})}
                   className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"
-                  placeholder="misal: Tahsin Dewasa"
+                  placeholder={
+                    activeTab === 'periods' ? 'misal: 2026/2027' :
+                    activeTab === 'programs' ? 'misal: Kursus Tahsinul Khat' :
+                    activeTab === 'classes' ? 'misal: Kelas A1' :
+                    activeTab === 'muallims' ? 'misal: Ustadz Ahmad' : 'misal: Nama Tampilan'
+                  }
                 />
               </div>
+
+              {activeTab === 'classes' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-1">Program Induk</label>
+                  <select 
+                    required
+                    value={formData.programId || ''} 
+                    onChange={e => setFormData({...formData, programId: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="">-- Pilih Program --</option>
+                    {programsList.map(p => <option key={p.id} value={p.id}>{p.name} ({p.id})</option>)}
+                  </select>
+                </div>
+              )}
+
+              {activeTab === 'muallims' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-1">Kelas Induk</label>
+                  <select 
+                    required
+                    value={formData.classId || ''} 
+                    onChange={e => setFormData({...formData, classId: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="">-- Pilih Kelas --</option>
+                    {classesList.map(c => <option key={c.id} value={c.id}>{c.name} ({c.id})</option>)}
+                  </select>
+                </div>
+              )}
 
               {activeTab === 'periods' && (
                 <div className="flex items-center gap-3 bg-slate-950 p-4 rounded-xl border border-slate-700">
