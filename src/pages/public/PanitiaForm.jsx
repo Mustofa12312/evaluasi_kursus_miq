@@ -5,9 +5,11 @@ import DynamicForm from '../../components/form/DynamicForm';
 import IdentityForm from '../../components/form/IdentityForm';
 import PinGate from '../../components/form/PinGate';
 import { CheckCircle } from 'lucide-react';
+import { usePeriod } from '../../context/PeriodContext';
 
 export default function PanitiaForm() {
   const navigate = useNavigate();
+  const { selectedPeriod } = usePeriod();
   
   const [step, setStep] = useState(0); // 0: PinGate, 1: Identity, 2: Form
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,7 +49,7 @@ export default function PanitiaForm() {
     setIsSubmitting(true);
     const evaluationData = {
       role: 'panitia',
-      context: { programId: 'all', classId: 'all', identity }, // Panitia mengevaluasi secara keseluruhan
+      context: { programId: 'all', classId: 'all', identity, periodId: selectedPeriod }, // Panitia mengevaluasi secara keseluruhan
       answers: formData,
       submittedAt: new Date().toISOString()
     };

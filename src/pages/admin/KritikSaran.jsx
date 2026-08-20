@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import { getResponsesByRole, getAllQuestions } from '../../services/db';
 import { MessageSquare, Quote } from 'lucide-react';
+import { usePeriod } from '../../context/PeriodContext';
 
 export default function KritikSaran() {
   const [responses, setResponses] = useState([]);
   const [textQuestions, setTextQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { selectedPeriod } = usePeriod();
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
-      getResponsesByRole('peserta'),
-      getResponsesByRole('pendamping'),
-      getResponsesByRole('muallim'),
-      getResponsesByRole('panitia'),
+      getResponsesByRole('peserta', selectedPeriod),
+      getResponsesByRole('pendamping', selectedPeriod),
+      getResponsesByRole('muallim', selectedPeriod),
+      getResponsesByRole('panitia', selectedPeriod),
       getAllQuestions()
     ]).then(([peserta, pendamping, muallim, panitia, questions]) => {
       // Find all text type questions
@@ -22,7 +25,7 @@ export default function KritikSaran() {
       setResponses([...peserta, ...pendamping, ...muallim, ...panitia]);
       setLoading(false);
     });
-  }, []);
+  }, [selectedPeriod]);
 
   if (loading) return <div className="py-12 text-center text-slate-500 animate-pulse">Memuat data kritik dan saran dinamis...</div>;
 

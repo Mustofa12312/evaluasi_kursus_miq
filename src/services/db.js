@@ -127,8 +127,11 @@ export const submitEvaluation = async (evaluationData) => {
 
 // --- DATA FETCHING UNTUK DASHBOARD ADMIN ---
 
-export const getResponsesByRole = async (role) => {
-  const q = query(collection(db, "evaluations"), where("role", "==", role));
+export const getResponsesByRole = async (role, periodId = null) => {
+  let q = query(collection(db, "evaluations"), where("role", "==", role));
+  if (periodId) {
+    q = query(collection(db, "evaluations"), where("role", "==", role), where("context.periodId", "==", periodId));
+  }
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
@@ -145,7 +148,7 @@ export const deleteEvaluation = async (evaluationId) => {
 export const getDashboardStats = async (periodId = null) => {
   let q = query(collection(db, "evaluations"));
   if (periodId) {
-    q = query(collection(db, "evaluations"), where("periodeId", "==", periodId));
+    q = query(collection(db, "evaluations"), where("context.periodId", "==", periodId));
   }
   
   const querySnapshot = await getDocs(q);
@@ -169,6 +172,34 @@ export const getDashboardStats = async (periodId = null) => {
   const totalKepuasan = pesertaResponses.reduce((acc, curr) => acc + Number(curr.answers.q_p_5), 0);
   const rataKepuasan = pesertaResponses.length > 0 ? (totalKepuasan / pesertaResponses.length).toFixed(1) : 0;
 
+  // Group by programId for chartData
+  const programKepuasan = {};
+  pesertaResponses.forEach(r => {
+    const progId = r.context?.programId;
+    if (progId && progId !== 'all') {
+      if (!programKepuasan[progId]) {
+        programKepuasan[progId] = { total: 0, count: 0 };
+      }
+      programKepuasan[progId].total += Number(r.answers.q_p_5);
+      programKepuasan[progId].count += 1;
+    }
+  });
+
+  const chartData = Object.keys(programKepuasan).map(progId => {
+    const avg = (programKepuasan[progId].total / programKepuasan[progId].count).toFixed(1);
+    let name = progId;
+    if (progId === 'prog_tartil') name = 'Tartil';
+    else if (progId === 'prog_tahsin') name = 'Tahsin';
+    else if (progId === 'prog_qiraah') name = 'Qiraah';
+    else if (progId === 'prog_muallim') name = 'Muallim';
+    
+    return { name, kepuasan: Number(avg) };
+  });
+
+  if (chartData.length === 0) {
+    chartData.push({ name: "Belum Ada Data", kepuasan: 0 });
+  }
+
   return {
     totalResponden,
     rataKepuasan,
@@ -176,10 +207,7 @@ export const getDashboardStats = async (periodId = null) => {
     pendampingCount: roleCounts.pendamping,
     muallimCount: roleCounts.muallim,
     panitiaCount: roleCounts.panitia,
-    chartData: [
-      { name: "Tartil", kepuasan: rataKepuasan > 0 ? rataKepuasan : 4.5 },
-      { name: "Tahsin", kepuasan: rataKepuasan > 0 ? (rataKepuasan - 0.2).toFixed(1) : 4.2 }
-    ] // Ini sekadar aggregasi sederhana, idealnya di group by context.programId
+    chartData
   };
 };
 

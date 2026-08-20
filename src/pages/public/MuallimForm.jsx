@@ -6,9 +6,11 @@ import DynamicForm from '../../components/form/DynamicForm';
 import IdentityForm from '../../components/form/IdentityForm';
 import PinGate from '../../components/form/PinGate';
 import { CheckCircle, ArrowLeft } from 'lucide-react';
+import { usePeriod } from '../../context/PeriodContext';
 
 export default function MuallimForm() {
   const navigate = useNavigate();
+  const { selectedPeriod } = usePeriod();
   
   // States for flow
   const [step, setStep] = useState(0); // 0: PinGate, 1: Identity, 2: Program, 3: Class, 4: Eval
@@ -78,7 +80,7 @@ export default function MuallimForm() {
     setIsSubmitting(true);
     const evaluationData = {
       role: 'muallim',
-      context,
+      context: { ...context, periodId: selectedPeriod },
       answers: formData,
       submittedAt: new Date().toISOString()
     };

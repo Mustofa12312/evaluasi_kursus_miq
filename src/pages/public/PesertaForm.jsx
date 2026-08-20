@@ -6,9 +6,11 @@ import DynamicForm from '../../components/form/DynamicForm';
 import IdentityForm from '../../components/form/IdentityForm';
 import PinGate from '../../components/form/PinGate';
 import { CheckCircle, ArrowLeft } from 'lucide-react';
+import { usePeriod } from '../../context/PeriodContext';
 
 export default function PesertaForm() {
   const navigate = useNavigate();
+  const { selectedPeriod } = usePeriod();
   
   // States for flow
   const [step, setStep] = useState(0);
@@ -90,7 +92,7 @@ export default function PesertaForm() {
     setIsSubmitting(true);
     const evaluationData = {
       role: 'peserta',
-      context,
+      context: { ...context, periodId: selectedPeriod },
       answers: formData,
       submittedAt: new Date().toISOString()
     };
