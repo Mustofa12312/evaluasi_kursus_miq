@@ -129,11 +129,11 @@ export default function PesertaForm() {
           <div className="absolute top-5 left-10 right-10 sm:left-14 sm:right-14 h-1 bg-slate-800 rounded-full -translate-y-1/2 -z-10"></div>
           <div 
             className="absolute top-5 left-10 sm:left-14 h-1 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full -translate-y-1/2 -z-10 transition-all duration-700 shadow-[0_0_10px_rgba(16,185,129,0.5)]" 
-            style={{ width: `calc(${(step - 1) * 25}%)` }}
+            style={{ width: `calc(${(step - 1) * 50}%)` }}
           ></div>
           
           <div className="flex justify-between items-start">
-            {['Identitas', 'Program', 'Kelas', 'Muallim', 'Evaluasi'].map((label, idx) => {
+            {['Identitas', 'Program', 'Evaluasi'].map((label, idx) => {
               const currentStep = idx + 1;
               const isActive = step >= currentStep;
               const isCurrent = step === currentStep;
@@ -193,41 +193,11 @@ export default function PesertaForm() {
         )}
         
         {step === 3 && (
-          <div className="animate-slide-up opacity-0 fill-mode-forwards">
-            <button onClick={() => setStep(2)} className="text-emerald-400 font-medium text-sm mb-6 inline-flex items-center hover:text-emerald-300 transition-colors bg-emerald-400/10 px-4 py-2 rounded-lg">
-              <ArrowLeft size={16} className="mr-2" /> Kembali ke Program
-            </button>
-            <SelectCard 
-              title="Pilih Kelas / Kelompok Anda"
-              options={classes}
-              selectedId={context.classId}
-              onSelect={handleSelectClass}
-              loading={loadingObj.cls}
-            />
-          </div>
-        )}
-        
-        {step === 4 && (
-          <div className="animate-slide-up opacity-0 fill-mode-forwards">
-            <button onClick={() => setStep(3)} className="text-emerald-400 font-medium text-sm mb-6 inline-flex items-center hover:text-emerald-300 transition-colors bg-emerald-400/10 px-4 py-2 rounded-lg">
-              <ArrowLeft size={16} className="mr-2" /> Kembali ke Kelas
-            </button>
-            <SelectCard 
-              title="Pilih Muallim Anda"
-              options={muallims}
-              selectedId={context.muallimId}
-              onSelect={handleSelectMuallim}
-              loading={loadingObj.mual}
-            />
-          </div>
-        )}
-        
-        {step === 5 && (
           <div>
             <DynamicForm 
               questions={questions}
               onSubmit={handleFormSubmit}
-              onBack={() => setStep(4)}
+              onBack={() => setStep(2)}
               loading={loadingObj.qst || isSubmitting}
             />
           </div>
