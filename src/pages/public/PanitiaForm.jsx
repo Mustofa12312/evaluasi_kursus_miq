@@ -93,7 +93,7 @@ export default function PanitiaForm() {
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6">
       <div className="mb-12">
         <h1 className="text-4xl text-center font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400 mb-4">
-          Evaluasi Assatidz Panitia
+          Evaluasi Asatidz & Panitia
         </h1>
         <p className="text-center text-slate-400 max-w-xl mx-auto">
           Berikan penilaian objektif terkait pelaksanaan acara tahun ini demi perbaikan berkelanjutan.
