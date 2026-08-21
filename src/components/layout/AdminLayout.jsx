@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, LayoutDashboard, Users, UserCheck, MessageSquare, TrendingUp, LogOut, Database, ClipboardList, Target, GraduationCap, Flag } from 'lucide-react';
+import { Home, LayoutDashboard, Users, UserCheck, MessageSquare, TrendingUp, LogOut, Database, ClipboardList, Target, GraduationCap, Flag, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePeriod } from '../../context/PeriodContext';
 import Logo from '../../assets/Logo.png';
