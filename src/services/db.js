@@ -89,19 +89,29 @@ export const getMuallimsByClass = async (classId) => {
   }
 };
 
-export const getQuestionsByRole = async (role) => {
+export const getQuestionsByRole = async (role, programId = null) => {
   try {
     const q = query(collection(db, "questions"), where("role", "==", role));
     const querySnapshot = await getDocs(q);
-    const data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
+    let data = querySnapshot.docs.map(doc => ({ ...doc.data(), _docId: doc.id }));
+    
+    if (programId) {
+      data = data.filter(q => !q.programId || q.programId === 'all' || q.programId === programId);
+    }
     
     data.sort((a, b) => (a.order || 0) - (b.order || 0));
     
-    if (data.length === 0) return mockQuestions.filter(q => q.role === role).sort((a, b) => a.order - b.order);
+    if (data.length === 0) {
+      let mock = mockQuestions.filter(q => q.role === role);
+      if (programId) mock = mock.filter(q => !q.programId || q.programId === 'all' || q.programId === programId);
+      return mock.sort((a, b) => a.order - b.order);
+    }
     return data;
   } catch (err) {
     console.error("Error getQuestionsByRole:", err);
-    return mockQuestions.filter(q => q.role === role).sort((a, b) => a.order - b.order);
+    let mock = mockQuestions.filter(q => q.role === role);
+    if (programId) mock = mock.filter(q => !q.programId || q.programId === 'all' || q.programId === programId);
+    return mock.sort((a, b) => a.order - b.order);
   }
 };
 
