@@ -26,11 +26,10 @@ export default function PendampingForm() {
   // Loading States
   const [loadingObj, setLoadingObj] = useState({ prog: true, cls: false, qst: false });
   
-  // Selection Context
   const [context, setContext] = useState({
     identity: null,
-    programId: null,
-    classId: null
+    programId: [],
+    classId: []
   });
 
   const [isInitializing, setIsInitializing] = useState(true);
@@ -60,23 +59,51 @@ export default function PendampingForm() {
   };
 
   const handleSelectProgram = (id) => {
-    setContext(prev => ({ ...prev, programId: id, classId: null }));
-    setLoadingObj(prev => ({ ...prev, cls: true }));
-    setStep(3);
-    getClassesByProgram(id).then(data => {
-      setClasses(data);
-      setLoadingObj(prev => ({ ...prev, cls: false }));
+    setContext(prev => {
+      const current = Array.isArray(prev.programId) ? prev.programId : (prev.programId ? [prev.programId] : []);
+      const newProgramIds = current.includes(id) 
+        ? current.filter(pId => pId !== id) 
+        : [...current, id];
+      return { ...prev, programId: newProgramIds, classId: [] };
     });
   };
 
+  const handleContinueProgram = async () => {
+    const pIds = context.programId || [];
+    if (pIds.length === 0) return;
+    
+    setLoadingObj(prev => ({ ...prev, cls: true }));
+    setStep(3);
+    
+    let allClasses = [];
+    for (const pId of pIds) {
+      const data = await getClassesByProgram(pId);
+      allClasses = [...allClasses, ...data];
+    }
+    setClasses(allClasses);
+    setLoadingObj(prev => ({ ...prev, cls: false }));
+  };
+
   const handleSelectClass = (id) => {
-    setContext(prev => ({ ...prev, classId: id }));
+    setContext(prev => {
+      const current = Array.isArray(prev.classId) ? prev.classId : (prev.classId ? [prev.classId] : []);
+      const newClassIds = current.includes(id) 
+        ? current.filter(cId => cId !== id) 
+        : [...current, id];
+      return { ...prev, classId: newClassIds };
+    });
+  };
+
+  const handleContinueClass = async () => {
+    const cIds = context.classId || [];
+    if (cIds.length === 0) return;
+    
     setLoadingObj(prev => ({ ...prev, qst: true }));
     setStep(4);
-    getQuestionsByRole('pendamping').then(data => {
-      setQuestions(data);
-      setLoadingObj(prev => ({ ...prev, qst: false }));
-    });
+    
+    const data = await getQuestionsByRole('pendamping');
+    setQuestions(data);
+    setLoadingObj(prev => ({ ...prev, qst: false }));
   };
 
   const handleFormSubmit = async (formData) => {
@@ -200,6 +227,8 @@ export default function PendampingForm() {
               selectedId={context.programId}
               onSelect={handleSelectProgram}
               loading={loadingObj.prog}
+              multiSelect={true}
+              onContinue={handleContinueProgram}
             />
           </div>
         )}
@@ -215,6 +244,8 @@ export default function PendampingForm() {
               selectedId={context.classId}
               onSelect={handleSelectClass}
               loading={loadingObj.cls}
+              multiSelect={true}
+              onContinue={handleContinueClass}
             />
           </div>
         )}

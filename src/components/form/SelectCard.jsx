@@ -1,4 +1,4 @@
-export default function SelectCard({ options, selectedId, onSelect, title, loading }) {
+export default function SelectCard({ options, selectedId, onSelect, title, loading, multiSelect = false, onContinue }) {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12 animate-pulse">
@@ -21,7 +21,10 @@ export default function SelectCard({ options, selectedId, onSelect, title, loadi
       {title && <h3 className="text-2xl mb-6 font-display font-semibold text-slate-100">{title}</h3>}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {options.map((opt) => {
-          const isSelected = selectedId === opt.id;
+          const isSelected = multiSelect 
+            ? Array.isArray(selectedId) && selectedId.includes(opt.id)
+            : selectedId === opt.id;
+            
           return (
             <div
               key={opt.id}
@@ -43,6 +46,17 @@ export default function SelectCard({ options, selectedId, onSelect, title, loadi
           );
         })}
       </div>
+      
+      {multiSelect && Array.isArray(selectedId) && selectedId.length > 0 && (
+        <div className="mt-8 text-center animate-fade-in">
+          <button 
+            onClick={onContinue}
+            className="bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold py-3 px-8 rounded-xl shadow-lg transition-all hover:scale-105"
+          >
+            Lanjutkan
+          </button>
+        </div>
+      )}
     </div>
   );
 }
