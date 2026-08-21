@@ -44,7 +44,7 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/20 blur-[100px] rounded-full pointer-events-none"></div>
         
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/80 border border-slate-700 backdrop-blur-sm text-emerald-400 text-sm font-medium mb-8 shadow-xl">
-          <Sparkles size={16} /> Evaluasi Tahunan Terbuka 2026
+          <Sparkles size={16} /> Evaluasi Kursus Se-Madura
         </div>
         
         <h1 className="text-5xl md:text-7xl font-display font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-white via-slate-200 to-slate-500 mb-6 drop-shadow-sm">

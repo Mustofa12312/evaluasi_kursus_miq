@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Lock, Mail, ShieldAlert } from 'lucide-react';
+import Logo from '../../assets/Logo.png';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -44,9 +45,7 @@ export default function Login() {
         <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl p-8 sm:p-10">
           
           <div className="text-center mb-10">
-            <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-              <Lock size={32} className="text-emerald-400" />
-            </div>
+            <img src={Logo} alt="Logo" className="w-16 h-16 object-contain mx-auto mb-6 drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]" />
             <h1 className="text-3xl font-display font-bold text-white mb-2">Admin Area</h1>
             <p className="text-slate-400">Autentikasi diperlukan untuk melanjutkan.</p>
           </div>

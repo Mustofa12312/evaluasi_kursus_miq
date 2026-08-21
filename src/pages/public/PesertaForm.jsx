@@ -35,6 +35,8 @@ export default function PesertaForm() {
     muallimId: null
   });
 
+  const [isInitializing, setIsInitializing] = useState(true);
+
   // Fetch initial data (Programs & Security)
   useEffect(() => {
     Promise.all([
@@ -50,6 +52,7 @@ export default function PesertaForm() {
       } else {
         setStep(1);
       }
+      setIsInitializing(false);
     });
   }, []);
 
@@ -125,6 +128,14 @@ export default function PesertaForm() {
         <button onClick={() => navigate('/')} className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-4 rounded-xl border border-slate-600 transition-colors font-medium">
           Kembali ke Beranda
         </button>
+      </div>
+    );
+  }
+
+  if (isInitializing) {
+    return (
+      <div className="py-32 flex justify-center items-center">
+        <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }

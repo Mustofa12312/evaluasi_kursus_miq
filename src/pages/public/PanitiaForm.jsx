@@ -33,17 +33,12 @@ export default function PanitiaForm() {
         setPinSettings(settingsData.panitia);
         setStep(0);
       } else {
-        setStep(1);
+        setStep(2);
       }
       
       setLoading(false);
     });
   }, []);
-
-  const handleSelectIdentity = (ident) => {
-    setIdentity(ident);
-    setStep(2);
-  };
 
   const handleFormSubmit = async (formData) => {
     setIsSubmitting(true);
@@ -86,6 +81,14 @@ export default function PanitiaForm() {
     );
   }
 
+  if (loading) {
+    return (
+      <div className="py-32 flex justify-center items-center">
+        <div className="w-10 h-10 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6">
       <div className="mb-12">
@@ -102,15 +105,8 @@ export default function PanitiaForm() {
           <PinGate 
             roleName="Panitia" 
             requiredPin={pinSettings.pin} 
-            onSuccess={() => setStep(1)} 
-          />
-        )}
-        {step === 1 && (
-          <IdentityForm 
-            onSubmit={handleSelectIdentity} 
-            lembagaLabel="Divisi atau Pengamat" 
-            lembagaPlaceholder="Contoh: Divisi Acara" 
-            lembagaRequired={false}
+            onSuccess={() => setStep(2)} 
+            onCancel={() => navigate('/')}
           />
         )}
         {step === 2 && (
@@ -118,7 +114,7 @@ export default function PanitiaForm() {
             questions={questions}
             onSubmit={handleFormSubmit}
             loading={loading || isSubmitting}
-            onBack={() => setStep(1)}
+            onBack={() => navigate('/')}
           />
         )}
       </div>

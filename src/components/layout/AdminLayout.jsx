@@ -1,7 +1,8 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Shield, Home, LayoutDashboard, Users, UserCheck, MessageSquare, TrendingUp, LogOut, Database, ClipboardList, Target, GraduationCap, Flag } from 'lucide-react';
+import { Home, LayoutDashboard, Users, UserCheck, MessageSquare, TrendingUp, LogOut, Database, ClipboardList, Target, GraduationCap, Flag } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usePeriod } from '../../context/PeriodContext';
+import Logo from '../../assets/Logo.png';
 
 export default function AdminLayout() {
   const location = useLocation();
@@ -32,10 +33,8 @@ export default function AdminLayout() {
       {/* Premium Sidebar */}
       <aside className="w-72 bg-slate-900/80 backdrop-blur-xl border-r border-slate-800 p-6 flex flex-col relative z-20">
         <div className="flex items-center gap-3 mb-12 text-2xl font-display font-bold tracking-tight text-white">
-          <div className="p-2 bg-emerald-500/20 rounded-xl border border-emerald-500/30">
-            <Shield size={28} className="text-emerald-400" />
-          </div>
-          Admin<span className="text-emerald-400 font-light">Area</span>
+          <img src={Logo} alt="Logo" className="w-10 h-10 object-contain" />
+          <span>Admin<span className="text-emerald-400 font-light ml-1">Area</span></span>
         </div>
         
         <nav className="flex flex-col gap-2 flex-1">

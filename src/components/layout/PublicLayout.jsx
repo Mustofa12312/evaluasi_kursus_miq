@@ -1,5 +1,5 @@
 import { Outlet, Link } from 'react-router-dom';
-import { BookOpen } from 'lucide-react';
+import Logo from '../../assets/Logo.png';
 
 export default function PublicLayout() {
   return (
@@ -11,9 +11,7 @@ export default function PublicLayout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="p-2 bg-emerald-500/10 rounded-xl border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors">
-                <BookOpen size={24} className="text-emerald-400" />
-              </div>
+              <img src={Logo} alt="Evaluasi Kursus Logo" className="w-8 h-8 object-contain" />
               <span className="text-xl font-display font-bold text-white tracking-tight">
                 Evaluasi<span className="text-emerald-400 font-light ml-1">Kursus</span>
               </span>
