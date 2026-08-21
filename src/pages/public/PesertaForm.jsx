@@ -20,19 +20,15 @@ export default function PesertaForm() {
   
   // Data States
   const [programs, setPrograms] = useState([]);
-  const [classes, setClasses] = useState([]);
-  const [muallims, setMuallims] = useState([]);
   const [questions, setQuestions] = useState([]);
   
   // Loading States
-  const [loadingObj, setLoadingObj] = useState({ prog: true, cls: false, mual: false, qst: false });
+  const [loadingObj, setLoadingObj] = useState({ prog: true, qst: false });
   
   // Selection Context
   const [context, setContext] = useState({
     identity: null,
-    programId: null,
-    classId: null,
-    muallimId: null
+    programId: null
   });
 
   const [isInitializing, setIsInitializing] = useState(true);
@@ -62,30 +58,10 @@ export default function PesertaForm() {
   };
 
   const handleSelectProgram = (id) => {
-    setContext(prev => ({ ...prev, programId: id, classId: null, muallimId: null }));
-    setLoadingObj(prev => ({ ...prev, cls: true }));
-    setStep(3);
-    getClassesByProgram(id).then(data => {
-      setClasses(data);
-      setLoadingObj(prev => ({ ...prev, cls: false }));
-    });
-  };
-
-  const handleSelectClass = (id) => {
-    setContext(prev => ({ ...prev, classId: id, muallimId: null }));
-    setLoadingObj(prev => ({ ...prev, mual: true }));
-    setStep(4);
-    getMuallimsByClass(id).then(data => {
-      setMuallims(data);
-      setLoadingObj(prev => ({ ...prev, mual: false }));
-    });
-  };
-
-  const handleSelectMuallim = (id) => {
-    setContext(prev => ({ ...prev, muallimId: id }));
+    setContext(prev => ({ ...prev, programId: id }));
     setLoadingObj(prev => ({ ...prev, qst: true }));
-    setStep(5);
-    getQuestionsByRole('peserta').then(data => {
+    setStep(3); // Langsung ke Evaluasi
+    getQuestionsByRole('peserta', id).then(data => {
       setQuestions(data);
       setLoadingObj(prev => ({ ...prev, qst: false }));
     });

@@ -254,6 +254,13 @@ export default function MasterPertanyaan() {
                       ) : (
                         <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={12}/> Opsional</span>
                       )}
+                      {q.programId && q.programId !== 'all' ? (
+                        <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 truncate max-w-[200px]">
+                          {programs.find(p => p.id === q.programId)?.name || q.programId}
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded bg-slate-800 border border-slate-700">Semua Program</span>
+                      )}
                     </div>
                   </div>
 
@@ -301,6 +308,22 @@ export default function MasterPertanyaan() {
                     {roles.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-1">Berlaku untuk Program</label>
+                  <select 
+                    value={formData.programId || 'all'} 
+                    onChange={e => setFormData({...formData, programId: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="all">Semua Program (Umum)</option>
+                    {programs.map(p => (
+                      <option key={p.id} value={p.id}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-sm font-medium text-slate-400 mb-1">Tipe Jawaban</label>
                   <select 
