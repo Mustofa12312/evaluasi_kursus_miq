@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { getAllQuestions, addQuestion, updateQuestion, deleteQuestion } from '../../services/db';
+import { getAllQuestions, addQuestion, updateQuestion, deleteQuestion, getPrograms } from '../../services/db';
 import { Settings, Plus, Edit2, Trash2, CheckCircle2, AlertCircle, Download, Upload, FileDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 export default function MasterPertanyaan() {
   const [questions, setQuestions] = useState([]);
+  const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('peserta');
   
@@ -15,6 +16,7 @@ export default function MasterPertanyaan() {
   // Form State
   const [formData, setFormData] = useState({
     role: 'peserta',
+    programId: 'all',
     category: '',
     type: 'rating',
     text: '',
@@ -27,14 +29,18 @@ export default function MasterPertanyaan() {
   const roles = ['peserta', 'pendamping', 'muallim', 'panitia'];
 
   useEffect(() => {
-    fetchQuestions();
+    fetchQuestionsAndPrograms();
   }, []);
 
-  const fetchQuestions = async () => {
+  const fetchQuestionsAndPrograms = async () => {
     setLoading(true);
     try {
-      const data = await getAllQuestions();
-      setQuestions(data);
+      const [qData, pData] = await Promise.all([
+        getAllQuestions(),
+        getPrograms()
+      ]);
+      setQuestions(qData);
+      setPrograms(pData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -43,7 +49,7 @@ export default function MasterPertanyaan() {
   };
 
   const handleOpenAdd = () => {
-    setFormData({ role: activeTab, category: '', type: 'rating', text: '', required: true, order: questions.filter(q => q.role === activeTab).length + 1 });
+    setFormData({ role: activeTab, programId: 'all', category: '', type: 'rating', text: '', required: true, order: questions.filter(q => q.role === activeTab).length + 1 });
     setEditingId(null);
     setShowModal(true);
   };
@@ -51,6 +57,7 @@ export default function MasterPertanyaan() {
   const handleOpenEdit = (q) => {
     setFormData({
       role: q.role,
+      programId: q.programId || 'all',
       category: q.category,
       type: q.type,
       text: q.text,
