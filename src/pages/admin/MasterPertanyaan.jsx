@@ -8,6 +8,7 @@ export default function MasterPertanyaan() {
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('peserta');
+  const [activeProgramFilter, setActiveProgramFilter] = useState('all_view');
   
   // Modal State
   const [showModal, setShowModal] = useState(false);
@@ -100,7 +101,14 @@ export default function MasterPertanyaan() {
     }
   };
 
-  const filteredQuestions = questions.filter(q => q.role === activeTab).sort((a, b) => a.order - b.order);
+  const filteredQuestions = questions.filter(q => {
+    if (q.role !== activeTab) return false;
+    if (activeProgramFilter !== 'all_view') {
+      const qProgramId = q.programId || 'all';
+      if (qProgramId !== activeProgramFilter) return false;
+    }
+    return true;
+  }).sort((a, b) => a.order - b.order);
 
   const handleExport = () => {
     if (filteredQuestions.length === 0) {
@@ -228,6 +236,25 @@ export default function MasterPertanyaan() {
 
         {/* Content List */}
         <div className="p-6">
+          <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-700/50">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              <label className="text-sm text-slate-400 font-medium whitespace-nowrap">Filter Program:</label>
+              <select 
+                value={activeProgramFilter}
+                onChange={(e) => setActiveProgramFilter(e.target.value)}
+                className="w-full sm:w-auto bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"
+              >
+                <option value="all_view">Tampilkan Semua</option>
+                <option value="all">Hanya Pertanyaan Umum</option>
+                {programs.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="text-sm font-semibold text-emerald-400 bg-emerald-400/10 px-3 py-1.5 rounded-lg border border-emerald-400/20">
+              {filteredQuestions.length} Pertanyaan Ditemukan
+            </div>
+          </div>
           {loading ? (
             <div className="text-center py-12 text-slate-500">Memuat pertanyaan...</div>
           ) : filteredQuestions.length === 0 ? (
