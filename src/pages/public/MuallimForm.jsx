@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPrograms, getClassesByProgram, getQuestionsByRole, submitEvaluation, getSecuritySettings } from '../../services/db';
+import { getPrograms, getQuestionsByRole, submitEvaluation, getSecuritySettings } from '../../services/db';
 import SelectCard from '../../components/form/SelectCard';
 import DynamicForm from '../../components/form/DynamicForm';
 import IdentityForm from '../../components/form/IdentityForm';
@@ -13,14 +13,13 @@ export default function MuallimForm() {
   const { selectedPeriod } = usePeriod();
   
   // States for flow
-  const [step, setStep] = useState(0); // 0: PinGate, 1: Identity, 2: Program, 3: Class, 4: Eval
+  const [step, setStep] = useState(0); // 0: PinGate, 1: Identity, 2: Program, 3: Eval
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [pinSettings, setPinSettings] = useState({ enabled: false, pin: '' });
   
   // Data States
   const [programs, setPrograms] = useState([]);
-  const [classes, setClasses] = useState([]);
   const [questions, setQuestions] = useState([]);
   
   // Loading States
@@ -29,8 +28,7 @@ export default function MuallimForm() {
   // Selection Context
   const [context, setContext] = useState({
     identity: null,
-    programId: null,
-    classId: null
+    programId: null
   });
 
   const [isInitializing, setIsInitializing] = useState(true);
@@ -60,19 +58,9 @@ export default function MuallimForm() {
   };
 
   const handleSelectProgram = (id) => {
-    setContext(prev => ({ ...prev, programId: id, classId: null }));
-    setLoadingObj(prev => ({ ...prev, cls: true }));
-    setStep(3);
-    getClassesByProgram(id).then(data => {
-      setClasses(data);
-      setLoadingObj(prev => ({ ...prev, cls: false }));
-    });
-  };
-
-  const handleSelectClass = (id) => {
-    setContext(prev => ({ ...prev, classId: id }));
+    setContext(prev => ({ ...prev, programId: id }));
     setLoadingObj(prev => ({ ...prev, qst: true }));
-    setStep(4);
+    setStep(3);
     getQuestionsByRole('muallim').then(data => {
       setQuestions(data);
       setLoadingObj(prev => ({ ...prev, qst: false }));
@@ -141,11 +129,11 @@ export default function MuallimForm() {
           <div className="absolute top-5 left-10 right-10 sm:left-14 sm:right-14 h-1 bg-slate-800 rounded-full -translate-y-1/2 -z-10"></div>
           <div 
             className="absolute top-5 left-10 sm:left-14 h-1 bg-gradient-to-r from-purple-500 to-pink-400 rounded-full -translate-y-1/2 -z-10 transition-all duration-700 shadow-[0_0_10px_rgba(168,85,247,0.5)]" 
-            style={{ width: `calc(${(step - 1) * 33.33}%)` }}
+            style={{ width: `calc(${(step - 1) * 50}%)` }}
           ></div>
           
           <div className="flex justify-between items-start">
-            {['Identitas', 'Program', 'Kelas Ajaran', 'Evaluasi'].map((label, idx) => {
+            {['Identitas', 'Program', 'Evaluasi'].map((label, idx) => {
               const currentStep = idx + 1;
               const isActive = step >= currentStep;
               const isCurrent = step === currentStep;
@@ -205,26 +193,11 @@ export default function MuallimForm() {
         )}
         
         {step === 3 && (
-          <div className="animate-slide-up opacity-0 fill-mode-forwards">
-            <button onClick={() => setStep(2)} className="text-purple-400 font-medium text-sm mb-6 inline-flex items-center hover:text-purple-300 transition-colors bg-purple-400/10 px-4 py-2 rounded-lg">
-              <ArrowLeft size={16} className="mr-2" /> Kembali ke Program
-            </button>
-            <SelectCard 
-              title="Pilih Kelas yang Anda Ajar"
-              options={classes}
-              selectedId={context.classId}
-              onSelect={handleSelectClass}
-              loading={loadingObj.cls}
-            />
-          </div>
-        )}
-        
-        {step === 4 && (
           <div>
             <DynamicForm 
               questions={questions}
               onSubmit={handleFormSubmit}
-              onBack={() => setStep(3)}
+              onBack={() => setStep(2)}
               loading={loadingObj.qst || isSubmitting}
             />
           </div>
